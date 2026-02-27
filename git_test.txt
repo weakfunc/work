@@ -1,0 +1,1672 @@
+/*******************************************************************************
+ *  LeapMotor Proprietary Information.
+ *  This document contains proprietary and confidential information and is
+ *  tendered for information and evaluation purposes only; no copy or other
+ *  use or dissemination by a third party can be made of this information
+ *  without the express written permission of LeapMotor.
+ *
+ *******************************************************************************
+ *  Filename   : AppCom_DataInterface_VCU.c
+ *  Author     : 32655, 32655@leapmotor.com
+ *  Date       : 2025锟斤拷3锟斤拷20锟斤拷
+ *  Description:
+ *******************************************************************************/
+
+
+/*******************************************************************************
+ *  INCLUDES
+ *******************************************************************************/
+#include "VCU_Rte.h"
+#include "Rte_APPCOM_SWC.h"
+#include "AppFlt_Interface.h"
+#include "CalData_1.h"
+#include "AppCom_Interface.h"
+#include "AppCom_ErrorHandle.h"
+#include "AppCom_DataInterface_VCU.h"
+
+/*******************************************************************************
+ *  LOCAL CONSTANT MACROS
+ *******************************************************************************/
+
+
+/*******************************************************************************
+ *  LOCAL DATA TYPES AND STRUCTURES
+ *******************************************************************************/
+AppCom_VcuMsgRecvTr_tst AppCom_VcuMsg_RecvTr[APPCOM_NUM_OF_RECV_TR] = {
+    {&g_HPC_CDD_CDU_RecvTr, APPCOM_ERRMNTR_DCDC_324},
+    {&g_HPC_CDD_BMS_RecvTr, APPCOM_ERRMNTR_BMS_1A1 },
+    {&g_HPC_CDD_IVI_RecvTr, APPCOM_ERRMNTR_IVI_34A },
+    {&g_HPC_CDD_GCU_RecvTr, APPCOM_ERRMNTR_GCU_0BD },
+    {&g_HPC_TCM_TCM_RecvTr, APPCOM_ERRMNTR_GW_30B  },
+    {&g_HPC_CDD_PTC_RecvTr, APPCOM_ERRMNTR_GW_3B1  }
+};
+
+/*******************************************************************************
+ *  GLOBAL DATA PROTOTYPES
+ *******************************************************************************/
+
+
+ /**********************************************************************************************************************
+  *  VCU TX FUNCTION DECLARATION
+  *********************************************************************************************************************/
+ void AppCom_VcuTxDataHandle_0x13B_2ms (void);
+ void AppCom_VcuTxDataHandle_0x13B_10ms(void);
+
+ /*******************************************************************************
+  *  VCU P_CANFD Send message list
+  *******************************************************************************/
+ //void AppCom_VcuTxDataHandle_0x1E5(void);
+ void AppCom_VcuTxDataHandle_0x359(void);
+ void AppCom_VcuTxDataHandle_0x514(void);
+ void AppCom_VcuTxDataHandle_0x515(void);
+ void AppCom_VcuTxDataHandle_0x600(void);
+ void AppCom_VcuTxDataHandle_0xBB(void);
+ void AppCom_VcuTxDataHandle_0xBC(void);
+ void AppCom_VcuTxDataHandle_0xDE(void);
+ /*******************************************************************************
+  *  VCU C_CANFD Send message list
+  *******************************************************************************/
+ void AppCom_VcuTxDataHandle_0xB6(void);
+ void AppCom_VcuTxDataHandle_0xB7(void);
+ void AppCom_VcuTxDataHandle_0x1FF(void);
+ void AppCom_VcuTxDataHandle_0x1FE(void);
+
+
+ /*******************************************************************************
+  *  VCU VCU_CAN Send message list
+  *******************************************************************************/
+
+ /**********************************************************************************************************************
+  *  VCU RX FUNCTION DECLARATION
+  *********************************************************************************************************************/
+ void AppCom_VcuRxDataHandle_MCUM_0xCA_2ms (void);
+ void AppCom_VcuRxDataHandle_MCUM_0xCA_10ms(void);
+ /*******************************************************************************
+  *  VCU P_CANFD Receive message list
+  *******************************************************************************/
+ /*BMS Message*/
+ void AppCom_VcuRxDataHandle_BMS_0x1A1 (void);
+ void AppCom_VcuRxDataHandle_BMS_0x310 (void);
+ void AppCom_VcuRxDataHandle_BMS_0x5B5 (void);
+ void AppCom_VcuRxDataHandle_BMS_0x5B1 (void);
+ /*DCDC Message*/
+ void AppCom_VcuRxDataHandle_DCDC_0x324(void);
+ /*ECM Message*/
+ void AppCom_VcuRxDataHandle_ECM_0x148(void);
+ void AppCom_VcuRxDataHandle_ECM_0x5EC(void);
+ /*EMS Message*/
+ void AppCom_VcuRxDataHandle_EMS_0xBE(void);
+ /*EVCC Message*/
+ void AppCom_VcuRxDataHandle_EVCC_0x260(void);
+ /*GCU Message*/
+ void AppCom_VcuRxDataHandle_GCU_0xBD(void);
+ void AppCom_VcuRxDataHandle_GCU_0x2C1(void);
+ /*HPC-BCM Message*/
+ void AppCom_VcuRxDataHandle_BCM_0x291(void);
+ void AppCom_VcuRxDataHandle_BCM_0x292(void);
+ /*HPC-GW Message*/
+ void AppCom_VcuRxDataHandle_GW_0x30B(void);
+ void AppCom_VcuRxDataHandle_GW_0x3B1(void);
+ /*ICU Message*/
+ void AppCom_VcuRxDataHandle_ICU_0x249(void);
+ void AppCom_VcuRxDataHandle_ICU_0x24C(void);
+ /*IVI Message*/
+ void AppCom_VcuRxDataHandle_IVI_0x5F6(void);
+ void AppCom_VcuRxDataHandle_IVI_0x34A(void);
+ void AppCom_VcuRxDataHandle_IVI_0x3D8(void);
+ /*MCU Message*/
+ void AppCom_VcuRxDataHandle_MCUS_0xDB(void);
+ /*OBC Message*/
+ void AppCom_VcuRxDataHandle_OBC_0x316(void);
+ /*******************************************************************************
+  *  VCU C_CANFD Receive message list
+  *******************************************************************************/
+ /*ACU Message*/
+ void AppCom_VcuRxDataHandle_ACU_0x233(void);
+ void AppCom_VcuRxDataHandle_ACU_0x2A3(void);
+ /*HPC-ADAS Message*/
+ void AppCom_VcuRxDataHandle_ADAS_0x83(void);
+ void AppCom_VcuRxDataHandle_ADAS_0x84(void);
+ /*EPS Message*/
+ void AppCom_VcuRxDataHandle_EPS_0x18D(void);
+ /*FSC Message*/
+ void AppCom_VcuRxDataHandle_FSC_0x142(void);
+ /*HPC BCM Message*/
+ void AppCom_VcuRxDataHandle_BCM_0x290(void);
+ /*IBC Message*/
+ void AppCom_VcuRxDataHandle_IBC_0x182(void);
+ void AppCom_VcuRxDataHandle_IBC_0x183(void);
+ void AppCom_VcuRxDataHandle_IBC_0x184(void);
+ void AppCom_VcuRxDataHandle_IBC_0x185(void);
+ //void AppCom_VcuRxDataHandle_IBC_0x186(void);
+ void AppCom_VcuRxDataHandle_IBC_0x227(void);
+ void AppCom_VcuRxDataHandle_IBC_0xB1(void);
+ /*ICU Message*/
+ void AppCom_VcuRxDataHandle_ICU_0x24D(void);
+ void AppCom_VcuRxDataHandle_ICU_0x332(void);
+ /*IVI Message*/
+ void AppCom_VcuRxDataHandle_IVI_0x331(void);
+ /*LMC Message*/
+ void AppCom_VcuRxDataHandle_LMC_0xFA(void);
+ void AppCom_VcuRxDataHandle_LMC_0xFD(void);
+ void AppCom_VcuRxDataHandle_LMC_0x25A(void);
+
+ /*******************************************************************************
+  *  VCU VCU_CAN Receive message list
+  *******************************************************************************/
+
+ /*********************************************************************************************************************
+ * Function name: void AppCom_VcuTxDataHandle_0x13B_2ms(void)
+ * Description  : fetch data from the app to bus.
+ * Input        :
+ * Output       :
+ * Comment      :
+ * *******************************************************************************************************************/
+ void AppCom_VcuTxDataHandle_0x13B_2ms(void)
+{
+
+    AppCom_PCAN_VCU_0x13B.VCU_VehicleDirect             = g_RpmAdj_VehiDirect_Can;
+    AppCom_PCAN_VCU_0x13B.VCU_SuppressJitterRMCURequest = g_SigAggr_MotAntiJerkOffReq;
+    AppCom_PCAN_VCU_0x13B.VCU_RMCUMaxDischargePower     = g_Pwr_MotMaxDrvPwr_Can;
+    AppCom_PCAN_VCU_0x13B.VCU_RMCUMaxChargePower        = g_Pwr_MotMaxRecPwr_Can;
+    AppCom_PCAN_VCU_0x13B.VCU_RDrvControlMode           = g_TrqArb_RMotCtlType;
+    AppCom_PCAN_VCU_0x13B.VCU_RDrvRequesSpeed           = g_TrqArb_RMotRpmReq;
+    AppCom_PCAN_VCU_0x13B.VCU_RDrvRequestTorque         = g_RpmAdj_RMotTrqReq;
+    AppCom_PCAN_VCU_0x13B.VCU_VehicleSts                = g_VehiMode_ReadySts;
+    AppCom_PCAN_VCU_0x13B.VCU_BrakePedalValue           = AppCom_Sigval_Limit_f32(g_Ped_BrkPedPctFilt, MINIMUM_VCU_BRAKEPEDALVALUE, MAXIMUM_VCU_BRAKEPEDALVALUE);
+    AppCom_PCAN_VCU_0x13B.VCU_RDrvRequestTorqueVD       = g_RpmAdj_RMotTrqReqVD;
+    AppCom_PCAN_VCU_0x13B.VCU_MCUMDampgLmtFactor        = g_AntiJerk_RMotDampgLmtFactor;
+	AppCom_PCAN_VCU_0x13B.VCU_MCUMDampgLmtFactorVD      = g_AntiJerk_RMotDampgLmtFactorVD;
+	AppCom_PCAN_VCU_0x13B.VCU_MCUSDampgLmtFactor        = g_AntiJerk_FMotDampgLmtFactor;
+	AppCom_PCAN_VCU_0x13B.VCU_MCUSDampgLmtFactorVD      = g_AntiJerk_FMotDampgLmtFactorVD;
+	AppCom_PCAN_VCU_0x13B.VCU_MCUMMaxPosDampgTrq        = g_AntiJerk_RMotDampMaxTq;
+	AppCom_PCAN_VCU_0x13B.VCU_MCUMMaxNegDampgTrq        = g_AntiJerk_RMotDampMinTq;
+    AppCom_PCAN_VCU_0x13B.VCU_MCUSMaxPosDampgTrq        = g_AntiJerk_FMotDampMaxTq;
+    AppCom_PCAN_VCU_0x13B.VCU_MCUSMaxNegDampgTrq        = g_AntiJerk_FMotDampMinTq;
+	AppCom_PCAN_VCU_0x13B.VCU_RDrvControlModeVD         = g_TrqArb_RMotCtlTypeVD;
+	AppCom_PCAN_VCU_0x13B.VCU_VehicleDirectVD           = g_RpmAdj_VehiDirectVD_Can;
+
+    /*TODO: The following signal need to be used by VCU*/
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_IOC_0x13B_10ms(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x13B_10ms(void)
+{
+
+    AppCom_PCAN_VCU_0x13B.VCU_FDrvRequestTorque         = g_RpmAdj_FMotTrqReq;
+    AppCom_PCAN_VCU_0x13B.VCU_FDrvRequesSpeed        = g_TrqArb_FMotRpmReq;
+    AppCom_PCAN_VCU_0x13B.VCU_FVehicleSts            = g_VehiMode_ReadyStsF;
+    AppCom_PCAN_VCU_0x13B.VCU_VehicleHighVoltModeF   = g_Hv_VheiHvModeF;
+    AppCom_PCAN_VCU_0x13B.VCU_FDrvControlMode        = g_TrqArb_FMotCtlType;
+    AppCom_PCAN_VCU_0x13B.VCU_BrakeSysFault          = g_Ped_BrakeSysFault;
+    AppCom_PCAN_VCU_0x13B.VCU_AccPedalValid          = g_Ped_AccPedFaultSts;
+    AppCom_PCAN_VCU_0x13B.VCU_ThrottlePosition       = g_Ped_AccPedPct;
+    AppCom_PCAN_VCU_0x13B.VCU_GearLevelPosSts        = g_Gear_GearLevelPosSts;
+    AppCom_PCAN_VCU_0x13B.VCU_Vehicle_Warning        = g_Warn_VehiWarningLv;
+    AppCom_PCAN_VCU_0x13B.VCU_BMSMainRelayR_Cmd      = g_Hv_BmsMainRelayCmd;
+    AppCom_PCAN_VCU_0x13B.VCU_BMSEmergencyCmd        = g_Hv_BmsEmergCmd;
+    AppCom_PCAN_VCU_0x13B.VCU_FMCUActiveReleaseCmd   = g_Hv_FMcuActiveReleaseCmd;
+    AppCom_PCAN_VCU_0x13B.VCU_RMCUActiveReleaseCmd   = g_Hv_RMcuActiveReleaseCmd;
+    AppCom_PCAN_VCU_0x13B.VCU_AlwACChargeInventerSts = g_Chg_AcAlwChgSts;
+    AppCom_PCAN_VCU_0x13B.VCU_AlwDCChargeSts         = g_Chg_DcAlwChgSts;
+    AppCom_PCAN_VCU_0x13B.VCU_ChargePauseReq         = g_Chg_ChgPauseReq;
+    AppCom_PCAN_VCU_0x13B.VCU_DCDCEnableCmd          = g_Lv_DcdcEnableCmd;
+    AppCom_PCAN_VCU_0x13B.VCU_VehicleHighVoltMode    = g_Hv_VheiHvModeR;
+    AppCom_PCAN_VCU_0x13B.VCU_ACOffReq               = g_Pwr_HvacOffReq;
+    AppCom_PCAN_VCU_0x13B.VCU_ACPwrLimited           = g_Pwr_HvacMaxPwrLmt;
+    AppCom_PCAN_VCU_0x13B.VCU_FuelTankLockReq        = g_FuelDet_FuelTankLockReq;
+    AppCom_PCAN_VCU_0x13B.VCU_BCM_Authentication_Sts = g_VehiMode_VCU_BCM_AuthnSts;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_IOC_0xCA_10ms (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_MCUM_0xCA_10ms(void)
+{
+    g_RMCU_SelfCheckSts     = AppCom_PCAN_MCUM_0xCA.RMCU_SelfCheckSts;
+    g_RMCU_WarningLv        = AppCom_PCAN_MCUM_0xCA.RMCU_WarningLevel;
+    g_RMCU_HvPwrOffReq      = AppCom_PCAN_MCUM_0xCA.RMCU_HighVoltPowerOffReq;
+    g_RMCU_MILlampReq       = AppCom_PCAN_MCUM_0xCA.RMCU_MILlampReq;
+    g_RMCU_ActiveReleaseSts = AppCom_PCAN_MCUM_0xCA.RMCU_ActiveReleaseSts;
+    g_RMCU_DCChargRelaySts  = AppCom_PCAN_MCUM_0xCA.RMCU_DCChargRelaySts;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_IOC_0xCA_2ms (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_MCUM_0xCA_2ms(void)
+{
+    g_RMCU_MotRpm           = AppCom_PCAN_MCUM_0xCA.RMCU_DrvMotorRPM;
+    g_RMCU_MotRpmVd         = AppCom_PCAN_MCUM_0xCA.RMCU_HWRdcFault;
+    g_RMCU_MotorSts         = AppCom_PCAN_MCUM_0xCA.RMCU_DragSts;
+    g_RMCU_MotTrq           = AppCom_PCAN_MCUM_0xCA.RMCU_ActualTorqueFB;
+    g_RMCU_MaxTrqAllow      = AppCom_PCAN_MCUM_0xCA.RMCU_MaxTorqueAllow;
+	g_RMCU_MinTrqAllow      = AppCom_PCAN_MCUM_0xCA.RMCU_MinTorqueAllow;
+    g_RMCU_MaxRpmAllow      = AppCom_PCAN_MCUM_0xCA.RMCU_MaxSpeedAllow;
+    g_RMCU_MainVolt         = AppCom_PCAN_MCUM_0xCA.RMCU_MainWireVolt;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0xBB(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0xBB(void)
+{
+    AppCom_PCAN_VCU_0xBB.VCU_GCURequestTorque     = g_RETrq_GCUReqTrq;
+    AppCom_PCAN_VCU_0xBB.VCU_GCUControlMode       = g_EngReq_GCUCtrlMod;
+    AppCom_PCAN_VCU_0xBB.VCU_GCUAassistFB         = g_EngReq_GCUAassistFB;
+    AppCom_PCAN_VCU_0xBB.VCU_GCUActiveReleaseCmd  = g_Hv_GcuActiveReleaseCmd;
+    AppCom_PCAN_VCU_0xBB.VCU_PowerOverSts         = g_RELmt_REOverPwrFlg;
+    AppCom_PCAN_VCU_0xBB.VCU_GCURequesSpeed       = g_RETrq_GCUReqSpd;
+    AppCom_PCAN_VCU_0xBB.VCU_PowerReducetSts      = g_RELmt_FastTrqActive_101;
+    AppCom_PCAN_VCU_0xBB.VCU_MotChargePower       = g_RETrq_TarChgPwr;
+    AppCom_PCAN_VCU_0xBB.VCU_APS1Position         = g_Ped_AccLThrPosition;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineStartReq       = g_EngReq_EngStrtReq;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineFuelInhibitReq = g_EngReq_EngFuelInhibitReq;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineOffRequest     = g_EngReq_EngOffReq;
+    AppCom_PCAN_VCU_0xBB.VCU_STorqueReqValid      = g_RETrq_TrqReqValS;
+    AppCom_PCAN_VCU_0xBB.VCU_STorqueReq           = g_RETrq_EMSTrqReqS;
+    AppCom_PCAN_VCU_0xBB.VCU_FTorqueSwFb          = g_RELmt_FastTrqActive;
+    AppCom_PCAN_VCU_0xBB.VCU_FVVOpenReq           = g_FuelDet_FVVOpenReq;
+    AppCom_PCAN_VCU_0xBB.VCU_WarmUpCycleIndicator = g_OBD_WarmUpCycIndica;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineResetSts       = g_EngReq_EngResetSts;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineSts            = g_EngReq_EngineSts;
+    AppCom_PCAN_VCU_0xBB.VCU_FTorqueReq           = g_RETrq_EMSTrqReqF;
+    AppCom_PCAN_VCU_0xBB.VCU_FTorqueReqValid      = g_RETrq_TrqReqValF;
+    AppCom_PCAN_VCU_0xBB.VCU_REsystemSts          = g_RESysSt_REReadySts;
+    AppCom_PCAN_VCU_0xBB.VCU_REsystemFaultSts     = g_RESysSt_RESysFaultSts;
+    AppCom_PCAN_VCU_0xBB.VCU_APS2Position         = g_Ped_AccHThrPosition;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineRunAllowFlg    = g_RESysSt_REsystemSts_102;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineIdleReq        = g_EngSpc_EngineIdleReq;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineIdleSpeed      = g_EngSpc_EngineIdleSpeed;
+    AppCom_PCAN_VCU_0xBB.VCU_EngineFuleCutoffReq  = g_EngReq_EngFuleCutoffReq;
+    AppCom_PCAN_VCU_0xBB.VCU_ForceChgPwr          = g_RETrq_VCU_ForceChgPwr;
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0xBC(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0xBC(void)
+{
+    AppCom_PCAN_VCU_0xBC.VCU_VehicleSpdDirect        = g_Spd_VehiSpd;
+    AppCom_PCAN_VCU_0xBC.VCU_VehicleSpdDirectVD      = g_Spd_VehiSpdVd;
+    AppCom_PCAN_VCU_0xBC.VCU_DeliveryModeSts         = g_FuncCfg_DeliveryModeSts;
+    AppCom_PCAN_VCU_0xBC.VCU_ChrgDischrgFunSts       = g_Chg_ChrgDischrgFunSts;
+//    AppCom_PCAN_VCU_0xBC.VCU_CalibrationNumber       = Cal_CalibrationIndex;
+    AppCom_PCAN_VCU_0xBC.VCU_HighVoltSysSts          = g_Hv_HighVoltSysSts;
+    AppCom_PCAN_VCU_0xBC.VCU_GearLvrChangeSts        = g_Gear_ShiftFailureReason;
+    AppCom_PCAN_VCU_0xBC.VCU_SinglePedalSts          = g_OnePed_SysFaultSts;
+    AppCom_PCAN_VCU_0xBC.VCU_VehicleNegTrqRspdSts    = g_Stability_VehicleNegTrqRspdSts;
+    AppCom_PCAN_VCU_0xBC.VCU_DriveFHVILSts           = g_Hvil_DrvHvilStsF;
+    AppCom_PCAN_VCU_0xBC.VCU_DriveRHVILSts           = g_Hvil_DrvHvilStsR;
+    AppCom_PCAN_VCU_0xBC.VCU_DCChgHVILSts            = g_Hvil_DcChgHvilSts;
+    AppCom_PCAN_VCU_0xBC.VCU_ACChgHVILSts            = g_Hvil_AcChgHvilSts;
+    AppCom_PCAN_VCU_0xBC.VCU_CCMHVILSts              = g_Hvil_CcmHvilSts;
+    AppCom_PCAN_VCU_0xBC.VCU_SystemError             = g_Warn_SystemError;
+    AppCom_PCAN_VCU_0xBC.VCU_AccPedalFaultLV         = g_Ped_AccPedFaultLv;
+    AppCom_PCAN_VCU_0xBC.VCU_LVSystemError           = g_Warn_LvSystemError;
+    AppCom_PCAN_VCU_0xBC.VCU_HVSystemError           = g_Warn_HvSystemError;
+    AppCom_PCAN_VCU_0xBC.VCU_LPedalModeSts           = g_OnePed_OnePedalSts;
+    AppCom_PCAN_VCU_0xBC.VCU_SpdLimModeSts           = g_SpdLmt_VCU_SpdLimModeSts;
+    AppCom_PCAN_VCU_0xBC.VCU_WheelTrqType            = g_TrqArb_WheelTrqType;
+    AppCom_PCAN_VCU_0xBC.VCU_GearLevelPosFault       = g_Gear_GearLevelPosFault;
+    AppCom_PCAN_VCU_0xBC.VCU_OpeartingMode           = g_VehiMode_VehiMode;
+    AppCom_PCAN_VCU_0xBC.VCU_DriverAssistProhibitSts = g_Gear_AdasForbid;
+    AppCom_PCAN_VCU_0xBC.VCU_EnergyMode              = g_RESysSt_REModeReq;
+    AppCom_PCAN_VCU_0xBC.VCU_BrakeSwitchSts          = g_Ped_BrkPedSts;
+    AppCom_PCAN_VCU_0xBC.VCU_HVILSysSts              = g_Hvil_HvilFaultSts;
+    AppCom_PCAN_VCU_0xBC.VCU_SlopeEst                = g_ParaEsti_SlopeEst_Can;
+    AppCom_PCAN_VCU_0xBC.VCU_SlopeEst_Valid          = g_ParaEsti_SlopeEstVd;
+    AppCom_PCAN_VCU_0xBC.VCU_MCUMDiffProtectSts      = g_Stability_DiffProtRActFlg;
+	AppCom_PCAN_VCU_0xBC.VCU_MCUSDiffProtectSts      = g_Stability_DiffProtFActFlg;
+
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0x514(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x514(void)
+{
+    AppCom_PCAN_VCU_0x514.VCU_MilLamp                       = g_OBD_MilLampReq;
+    AppCom_PCAN_VCU_0x514.VCU_EngineStartFailure_ID514      = g_EngReq_EngStrtFail;
+    AppCom_PCAN_VCU_0x514.VCU_ParkBeforeFuelup              = g_FuelDet_ParkReminder;
+    AppCom_PCAN_VCU_0x514.VCU_REsystemFaultSts_ID514        = g_RESysSt_RESysFaultSts_514;
+    AppCom_PCAN_VCU_0x514.VCU_EngineRunAllowFlg_ID514       = g_RESysSt_REsystemSts_514;
+    AppCom_PCAN_VCU_0x514.VCU_InverterTip                   = g_Chg_InverterTip;
+    AppCom_PCAN_VCU_0x514.VCU_EMSRepairModeSts              = g_REMode_RepairFB;
+    AppCom_PCAN_VCU_0x514.VCU_FuelTankFlapSts               = g_FuelDet_FuelTankFlapSts;
+    AppCom_PCAN_VCU_0x514.VCU_REsystemSts_ID514             = g_RESysSt_REReadySts_514;
+    AppCom_PCAN_VCU_0x514.VCU_ParkBeforeGear                = g_Gear_ParkBeforeGear;
+    AppCom_PCAN_VCU_0x514.VCU_BrakeBeforeGear               = g_Gear_BrakeBeforeGear;
+    AppCom_PCAN_VCU_0x514.VCU_GearBeforDriving              = g_Spd_GearBeforeDriving;
+    AppCom_PCAN_VCU_0x514.VCU_PreventSliding                = g_Spd_PreventSliding;
+    AppCom_PCAN_VCU_0x514.VCU_PGearFlashSts                 = g_Gear_GearPFlashSts;
+    AppCom_PCAN_VCU_0x514.VCU_ACConnectSts                  = g_Chg_AcChgerConSts;
+    AppCom_PCAN_VCU_0x514.VCU_DcChgPwrSts                   = g_Chg_DcChgerConSts;
+    AppCom_PCAN_VCU_0x514.VCU_ShowCarModeSts                = g_FuncCfg_ShowCarModeSts;
+    AppCom_PCAN_VCU_0x514.VCU_MilLampRequest_ID514          = g_OBD_VCU_ReqMilLamp;
+    AppCom_PCAN_VCU_0x514.VCU_FuelDectionModeSts            = g_EngSpc_FuelDectionModeSts;
+    AppCom_PCAN_VCU_0x514.VCU_VehSpdLimtRemind_ID514        = g_SpdLmt_VehSpdLimtProp;
+    AppCom_PCAN_VCU_0x514.VCU_SinglePedalSts_ID514          = g_OnePed_SysFaultSts;
+    AppCom_PCAN_VCU_0x514.VCU_GearLevelPosFault_ID514       = g_Gear_GearLevelPosFault;
+    AppCom_PCAN_VCU_0x514.VCU_DriverAssistProhibitSts_ID514 = g_Gear_AdasForbid;
+    AppCom_PCAN_VCU_0x514.VCU_PowerModeAllow                = g_RESysSt_PowerModeAllow;
+    AppCom_PCAN_VCU_0x514.VCU_PowerModeSwitchMsg            = g_RESysSt_PowerModeSwitchFlg;
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0x515(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x515(void)
+{
+    //AppCom_PCAN_TxMsg_0x515_Core2.VCU_Pending_DTC
+    //AppCom_PCAN_TxMsg_0x515_Core2.VCU_Comfirmed_DTC
+    //AppCom_PCAN_TxMsg_0x515_Core2.VCU_Permanent_DTC
+    //AppCom_PCAN_TxMsg_0x515_Core2.VCU_MilReq_DTC
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0xDE(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0xDE(void)
+{
+    real32_T lcl_AIn_AccPedHPwr                        = (real32_T)g_AIn_AccPedHPwr * 0.001;
+    real32_T lcl_AIn_AccPedLPwr                        = (real32_T)g_AIn_AccPedLPwr * 0.001;
+    AppCom_PCAN_VCU_0xDE.VCU_DIn_DcChgPwr              = g_BCM_DCChrgPwr_Sts;
+    AppCom_PCAN_VCU_0xDE.VCU_DIn_AcChgPwr              = g_BCM_ACChrgPwr_Sts;
+    AppCom_PCAN_VCU_0xDE.VCU_DIn_BrkPedOpen            = g_DIn_BrkPedOpen;
+    AppCom_PCAN_VCU_0xDE.VCU_DIn_BrkPedClose           = g_DIn_BrkPedClose;
+    AppCom_PCAN_VCU_0xDE.VCU_DIn_ColumnShiftP          = g_DIn_ColumnShiftP;
+    AppCom_PCAN_VCU_0xDE.VCU_VehiMode_ChgMode          = g_VehiMode_ChgMode;
+    AppCom_PCAN_VCU_0xDE.VCU_Spd_VehiAccnFilt          = g_Spd_VehiAccnFilt;
+    AppCom_PCAN_VCU_0xDE.VCU_Hv_HvOffSts               = g_Hv_HvOffSts;
+    AppCom_PCAN_VCU_0xDE.VCU_AccFunc_CtlMode           = g_AccFunc_CtlMode;
+    AppCom_PCAN_VCU_0xDE.VCU_Hv_SelfChkSts             = g_Hv_SelfChkSts;
+    AppCom_PCAN_VCU_0xDE.VCU_Pwr_WheelMaxDrvTrq        = g_Pwr_WheelMaxDrvTrq;
+    AppCom_PCAN_VCU_0xDE.VCU_Pwr_WheelMaxRecTrq        = g_Pwr_WheelMaxRecTrq;
+    AppCom_PCAN_VCU_0xDE.VCU_Chg_AcChgerConSts         = g_Chg_AcChgerConSts;
+    AppCom_PCAN_VCU_0xDE.VCU_Crash_VehiCrashSts        = g_Crash_VehiCrashSts;
+    AppCom_PCAN_VCU_0xDE.VCU_Chg_AcInverterConSts      = g_Chg_AcInverterConSts;
+    AppCom_PCAN_VCU_0xDE.VCU_Lv_SleepSatisfiedSts      = g_Lv_SleepSatisfiedSts;
+    AppCom_PCAN_VCU_0xDE.VCU_LowPwr_LowBatt1Volt       = g_LowPwr_LowBatt1Volt;
+    AppCom_PCAN_VCU_0xDE.VCU_VehiMode_VehiHvCmd        = g_VehiMode_VehiHvCmd;
+    AppCom_PCAN_VCU_0xDE.VCU_LowPwr_LowBatt2Volt       = g_LowPwr_LowBatt2Volt;
+    AppCom_PCAN_VCU_0xDE.VCU_GearQuitAps               = g_Gear_ApsQuitReq;
+    AppCom_PCAN_VCU_0xDE.VCU_CDU_RecvTr                = g_HPC_CDD_CDU_RecvTr;
+    AppCom_PCAN_VCU_0xDE.VCU_BMS_RecvTr                = g_HPC_CDD_BMS_RecvTr;
+    AppCom_PCAN_VCU_0xDE.VCU_IVI_RecvTr                = g_HPC_CDD_IVI_RecvTr;
+    AppCom_PCAN_VCU_0xDE.VCU_GCU_RecvTr                = g_HPC_CDD_GCU_RecvTr;
+    AppCom_PCAN_VCU_0xDE.VCU_TCM_RecvTr                = g_HPC_TCM_TCM_RecvTr;
+    AppCom_PCAN_VCU_0xDE.VCU_PTC_RecvTr                = g_HPC_CDD_PTC_RecvTr;
+    AppCom_PCAN_VCU_0xDE.VCU_HighPerforDisable         = g_RESysSt_HighPerforDisable;
+    AppCom_PCAN_VCU_0xDE.VCU_HighPerforSwtFlg          = g_Pwr_HighPerforSwtFlg;
+    AppCom_PCAN_VCU_0xDE.VCU_On2KL15_Volt              = g_AIn_ON2_Volt;
+    AppCom_PCAN_VCU_0xDE.VCU_REDrvTarPwrFit            = g_RETrq_REDrvTarPwrFit;
+    AppCom_PCAN_VCU_0xDE.VCU_REPwrDampingFactor        = g_RETrq_PwrDampingFactor;
+    AppCom_PCAN_VCU_0xDE.VCU_LowPwr_DcChgPwrVolt       = g_LowPwr_DcChgPwrVolt;
+    AppCom_PCAN_VCU_0xDE.VCU_LowPwr_AcChgPwrVolt       = g_LowPwr_AcChgPwrVolt;
+    AppCom_PCAN_VCU_0xDE.VCU_Ped_AccPedHSigVolt        = g_Ped_AccPedHSigVolt;
+    AppCom_PCAN_VCU_0xDE.VCU_Ped_AccPedLSigVolt        = g_Ped_AccPedLSigVolt;
+    AppCom_PCAN_VCU_0xDE.VCU_Ped_AccPedHPwrVolt        = lcl_AIn_AccPedHPwr;
+    AppCom_PCAN_VCU_0xDE.VCU_Ped_AccPedLPwrVolt        = lcl_AIn_AccPedLPwr;
+    AppCom_PCAN_VCU_0xDE.VCU_Chg_DcChgerConSts         = g_Chg_DcChgerConSts;
+    AppCom_PCAN_VCU_0xDE.VCU_REStartReq                = g_REMode_REStartReq;
+    AppCom_PCAN_VCU_0xDE.VCU_REStopReq                 = g_REMode_REStopReq;
+    AppCom_PCAN_VCU_0xDE.VCU_Pwr_WheelPwrOvrLimitflgRE = g_Pwr_WheelPwrOvrLimitflgRE;
+    AppCom_PCAN_VCU_0xDE.VCU_REOverChgPwrFlag          = g_RELmt_REOverChgPwrFlg;
+    AppCom_PCAN_VCU_0xDE.VCU_FuelDetctionModule        = g_FuelDet_EngFuelStopReq;
+    AppCom_PCAN_VCU_0xDE.VCU_ElecPwrBalanceReq         = g_ElecCula_ElecPwrBalanReq;
+    AppCom_PCAN_VCU_0xDE.VCU_Vehicle_NVHPwrLimitVal    = g_RELmt_NVHPwrLmtVal;
+    AppCom_PCAN_VCU_0xDE.VCU_Vehicle_PreReqChgPwr      = g_RELmt_PreReqChgPwr;
+    AppCom_PCAN_VCU_0xDE.VCU_VehiPowrConsumption       = g_ElecCula_VehPwrConsump;
+    AppCom_PCAN_VCU_0xDE.VCU_VehPwrChageLimit          = g_RELmt_VehPwrChgLmt;
+    AppCom_PCAN_VCU_0xDE.VCU_PwrReqByTqr               = g_RETrq_PwrReqByTrq;
+    AppCom_PCAN_VCU_0xDE.VCU_FastPwrRequest            = g_RELmt_FastPwrReq;
+    AppCom_PCAN_VCU_0xDE.VCU_Pwr_LossFctorFlg          = g_Pwr_LossFctorFlg;
+    AppCom_PCAN_VCU_0xDE.VCU_EngineOff_Flag            = g_EngReq_EngOffFlg;
+    AppCom_PCAN_VCU_0xDE.VCU_EngineStopAllow           = g_EngReq_EngStopAllow;
+
+    AppCom_PCAN_VCU_0xDE.VCU_RMCUMaxMechDischrgPower   = g_Pwr_MotMaxDrvPwr;
+    AppCom_PCAN_VCU_0xDE.VCU_MDrvFilterTrqRange        = g_AntiJerk_RmotFilterTrqRange;
+
+
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0x359(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x359(void)
+{
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_ESC              = g_EolCfg_ESC;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_EPB              = g_EolCfg_EPB;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_AEB              = g_EolCfg_AEB;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_InverterFunc     = g_EolCfg_InverterFunc;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_APS              = g_EolCfg_APS;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_WheelType        = g_EolCfg_WheelType;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_Curise           = g_EolCfg_Curise;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_VehiType         = g_EolCfg_VehiType;
+    AppCom_PCAN_VCU_0x359.VCU_Pwr_RShaftSpdAccn       = g_Pwr_RShaftSpdAccn;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_MotDrvStructure  = g_EolCfg_MotDrvStructure;
+    AppCom_PCAN_VCU_0x359.VCU_WLTCModeFlag            = g_ElecCula_WLTCModeFlg;
+    AppCom_PCAN_VCU_0x359.VCU_PWakeupSt               = g_HPC_CDD_P_WakeupSt;
+    AppCom_PCAN_VCU_0x359.VCU_InterChagEngStatrReq    = g_EngSpc_InterChagStartReq;
+    AppCom_PCAN_VCU_0x359.VCU_EmergencyStopReq        = g_EngReq_EmercyStopReq;
+    AppCom_PCAN_VCU_0x359.VCU_InterAllowEngStart      = g_RESysSt_InterAllowEngStart;
+    AppCom_PCAN_VCU_0x359.VCU_REMotorRpmVaild         = g_REPreSig_REMotRpmVD;
+    AppCom_PCAN_VCU_0x359.VCU_EngineAllowStop         = g_EngSpc_EngineStopAllow;
+    AppCom_PCAN_VCU_0x359.VCU_BattRealTimePwrVD       = g_REPreSig_BatRealTiPwrVD;
+    AppCom_PCAN_VCU_0x359.VCU_GCUChargeTimePwrVD      = g_REPreSig_GCUChgTiPwrVD;
+    AppCom_PCAN_VCU_0x359.VCU_GCUChargeTimePwr        = g_REPreSig_GCUChgTiPwr;
+    AppCom_PCAN_VCU_0x359.VCU_BattRealTimePwr         = g_REPreSig_BatRealTiPwr;
+    AppCom_PCAN_VCU_0x359.VCU_REMotorRpmVal           = g_REPreSig_REMotRpmVal;
+    AppCom_PCAN_VCU_0x359.VCU_AdditionalPwrVal        = g_REPreSig_AddPwrVal;
+    AppCom_PCAN_VCU_0x359.VCU_VehichRealPwDown        = g_RETrq_VehRealPwrDown;
+    AppCom_PCAN_VCU_0x359.BSW_VertifySts              = g_BSW_VertifySts;
+
+
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_RudderDir        = g_EolCfg_RudderType;
+    AppCom_PCAN_VCU_0x359.VCU_EolCfg_DCChgRelayPos    = g_EolCfg_DCChargRelayType;
+	AppCom_PCAN_VCU_0x359.VCU_EolCfg_FPTCIL           = g_EolCfg_PTCHvilCfg;
+	AppCom_PCAN_VCU_0x359.VCU_SpdLimitReason          = g_SpdLmt_VCU_SpdLimitReason;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0x600(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x600(void)
+{
+    uint8 reserved_bit = 0U;
+    uint8 unused_bit = 0U;
+
+    uint8 lcl_Byte_0 = 0U;
+    lcl_Byte_0 = g_LowPwr_LowBattOV
+               | (g_LowPwr_LowBattUV<<1)
+               | (g_LowPwr_DcChgPwrOV<<2)
+               | (g_LowPwr_DcChgPwrUV<<3)
+               | (g_LowPwr_AcChgPwrOV<<4)
+               | (g_LowPwr_AcChgPwrUV<<5)
+               | (g_Lv_DcdcFaultSts<<6)
+               | (g_Ped_BrakeSigFault<<7);
+
+    uint8 lcl_Byte_1 = 0U;
+    lcl_Byte_1 = g_Ped_AccPedHPwrUV
+               | (g_Ped_AccPedHPwrOV<<1)
+               | (g_Ped_AccPedLPwrUV<<2)
+               | (g_Ped_AccPedLPwrOV<<3)
+               | (g_Ped_AccPedHSigSTB<<4)
+               | (g_Ped_AccPedHSigOV<<5)
+               | (g_Ped_AccPedHSigUV<<6)
+               | (g_Ped_AccPedHSigSTGorCO<<7);
+
+    uint8 lcl_Byte_2 = 0U;
+    lcl_Byte_2 = g_Ped_AccPedLSigSTB
+               | (g_Ped_AccPedLSigOV<<1)
+               | (g_Ped_AccPedLSigUV<<2)
+               | (g_Ped_AccPedLSigSTGorCO<<3)
+               | (g_Ped_AccPedSigSyncFault<<4)
+               | (g_Hvil_CcmOuterHvilSTB<<5)
+               | (g_Hvil_CcmOuterHvilSTG<<6)
+               | (g_Hvil_CcmOuterHvilAbor<<7);
+
+    uint8 lcl_Byte_3 = 0U;
+    lcl_Byte_3 = (1U-g_Hvil_DrvHvilStsR)
+               | ((1U-g_Hvil_AcChgHvilSts)<<1)
+               | ((1U-g_Hvil_DcChgHvilSts)<<2)
+               | ((1U-g_Hvil_HvilSts)<<3)
+               | (g_Hv_StartFailureAsHvilFault<<4)
+               | (g_Hv_StartFailureAsRmcuFault<<5)
+               | (g_Hv_StartFailureAsBmsFault<<6)
+               | (g_Hv_StartFailureAsOtherFault<<7);
+
+    uint8 lcl_Byte_4 = 0U;
+    lcl_Byte_4 = g_Chg_DcChgerPTempOT
+               | (g_Chg_DcChgerNTempOT<<1)
+               | (g_Chg_AcChgerPTempOT<<2)
+               | (g_OBD_EngStrtFail<<3)
+               | (g_Stability_ESCFailed<<4)
+               | (g_CanDiag_MissMsgGw<<5)
+               | (g_CanDiag_RollCntErrGw<<6)
+               | (g_CanDiag_ChksumErrGw<<7);
+
+    uint8 lcl_Byte_5 = 0U;
+    lcl_Byte_5 = reserved_bit
+               | (reserved_bit<<1)
+               | (g_BSW_AuthenticationKey_Loss<<2)
+               | (g_BSW_Authentication_Fail<<3)
+               | (g_Ped_BrakeSysFault<<4)
+               | (g_Gear_PStatusFault<<5)
+               | (g_Gear_PRollCntFault<<6)
+               | (g_Gear_PCheckFault<<7);
+
+    uint8 lcl_Byte_6 = 0U;
+    lcl_Byte_6 = g_Gear_RNDStatusFault
+               | (g_Gear_RNDRollCntFault<<1)
+               | (g_Gear_RNDCheckFault<<2)
+               | (g_HPC_CDD_CalibrationDataCrcErr<<3)
+               | (g_HPC_CDD_CalibrationAppCrcErr <<4)
+               | (g_HPC_CDD_CalibrationReadErr<<5)
+               | (g_CanDiag_MissMsgHighRmcu<<6)
+               | (g_HPC_CDD_CalibrationVerifyErr<<7);
+
+    uint8 lcl_Byte_7 = 0U;
+    lcl_Byte_7 = unused_bit
+               | (unused_bit<<1)
+               | (unused_bit<<2)
+               | (g_Crash_VehiCrashSts<<3)
+               | (reserved_bit<<4)
+               | (reserved_bit<<5)
+               | (reserved_bit<<6)
+               | (reserved_bit<<7);
+
+    uint8 lcl_Byte_8 = 0U;
+    lcl_Byte_8 = g_OBD_VCU_EMSMilLampRequest
+               | (g_OBD_GCU_MILlampReq<<1)
+               | (g_OBD_RMCU_MILlampReq<<2)
+               | (g_OBD_BMS_MILlampReq<<3)
+               | (g_OBD_VCU_EHBMilLampRequest<<4)
+               | (g_OBD_TMS_MilLampReq<<5)
+               | (g_OBD_VCU_ReqMilLamp_601<<6)
+               | (g_CanDiag_CcanBusoff<<7);
+
+    uint8 lcl_Byte_9 = 0U;
+    lcl_Byte_9 = g_CanDiag_PcanBusoff
+               | (g_CanDiag_MissMsgFMcu<<1)
+               | (g_CanDiag_RollCntErrFMcu<<2)
+               | (g_CanDiag_ChksumErrFMcu<<3)
+               | (g_CanDiag_MissMsgRMcu<<4)
+               | (g_CanDiag_RollCntErrRMcu<<5)
+               | (g_CanDiag_ChksumErrRMcu<<6)
+               | (g_CanDiag_MissMsgBms<<7);
+
+    uint8 lcl_Byte_10 = 0U;
+    lcl_Byte_10 = g_CanDiag_RollCntErrBms
+                | (g_CanDiag_ChksumErrBms<<1)
+                | (g_CanDiag_MissMsgDcdc<<2)
+                | (g_CanDiag_RollCntErrDcdc<<3)
+                | (unused_bit<<4)
+                | (g_CanDiag_MissMsgObc<<5)
+                | (g_CanDiag_RollCntErrObc<<6)
+                | (unused_bit<<7);
+
+    uint8 lcl_Byte_11 = 0U;
+    lcl_Byte_11 =  g_CanDiag_MissMsgAcu
+                | (g_CanDiag_RollCntErrAcu<<1)
+                | (g_CanDiag_ChksumErrAcu<<2)
+                | (g_CanDiag_MissMsgIbc<<3)
+                | (g_CanDiag_RollCntErrIbc<<4)
+                | (g_CanDiag_ChksumErrIbc<<5)
+                | (g_CanDiag_MissMsgEps<<6)
+                | (g_CanDiag_RollCntErrEps <<7);
+
+    uint8 lcl_Byte_12 = 0U;
+    lcl_Byte_12 = g_CanDiag_ChksumErrEps
+                | (g_CanDiag_MissMsgHpc<<1)
+                | (g_CanDiag_RollCntErrHpc<<2)
+                | (g_CanDiag_ChksumErrHpc<<3)
+                | (g_CanDiag_MissMsgIcu<<4)
+                | (g_CanDiag_RollCntIcu<<5)
+                | (g_CanDiag_ChksumErrIcu<<6)
+                | (g_CanDiag_MissMsgIvi <<7);
+
+    uint8 lcl_Byte_13 = 0U;
+    lcl_Byte_13 =  g_CanDiag_RollCntErrIvi
+                | (g_CanDiag_ChksumErrIvi<<1)
+                | (g_CanDiag_MissMsgEms<<2)
+                | (g_CanDiag_ChksumErrEms<<3)
+                | (g_CanDiag_RollCntErrEms<<4)
+                | (g_CanDiag_MissMsgGcu<<5)
+                | (g_CanDiag_ChksumErrGcu<<6)
+                | (g_CanDiag_RollCntErrGcu<<7);
+
+    uint8 lcl_Byte_14 = 0U;
+    lcl_Byte_14 =  g_CanDiag_MissMsgAcc
+                | (g_CanDiag_RollCntErrAcc<<1)
+                | (g_CanDiag_ChksumErrAcc<<2)
+                | (g_CanDiag_MissMsgAps<<3)
+                | (g_CanDiag_RollCntErrAps<<4)
+                | (g_CanDiag_ChksumErrAps<<5)
+                | (g_Gear_ParkingSignal_SynFault<<6)
+                | (unused_bit <<7);
+
+    uint8 lcl_Byte_15 = 0U;
+    lcl_Byte_15 =  unused_bit
+                | (unused_bit<<1)
+                | (g_CanDiag_MissMsgLmc<<2)
+                | (g_CanDiag_ChksumErrLmc<<3)
+                | (g_CanDiag_RollCntErrLmc<<4)
+                | (g_CanDiag_MissMsgTcm<<5)
+                | (g_CanDiag_RollCntErrTcm<<6)
+                | (g_CanDiag_ChksumErrTcm<<7);
+
+    AppCom_PCAN_VCU_0x600.Byte0  = lcl_Byte_0;
+    AppCom_PCAN_VCU_0x600.Byte1  = lcl_Byte_1;
+    AppCom_PCAN_VCU_0x600.Byte2  = lcl_Byte_2;
+    AppCom_PCAN_VCU_0x600.Byte3  = lcl_Byte_3;
+    AppCom_PCAN_VCU_0x600.Byte4  = lcl_Byte_4;
+    AppCom_PCAN_VCU_0x600.Byte5  = lcl_Byte_5;
+    AppCom_PCAN_VCU_0x600.Byte6  = lcl_Byte_6;
+    AppCom_PCAN_VCU_0x600.Byte7  = lcl_Byte_7;
+    AppCom_PCAN_VCU_0x600.Byte8  = lcl_Byte_8;
+    AppCom_PCAN_VCU_0x600.Byte9  = lcl_Byte_9;
+    AppCom_PCAN_VCU_0x600.Byte10 = lcl_Byte_10;
+    AppCom_PCAN_VCU_0x600.Byte11 = lcl_Byte_11;
+    AppCom_PCAN_VCU_0x600.Byte12 = lcl_Byte_12;
+    AppCom_PCAN_VCU_0x600.Byte13 = lcl_Byte_13;
+    AppCom_PCAN_VCU_0x600.Byte14 = lcl_Byte_14;
+    AppCom_PCAN_VCU_0x600.Byte15 = lcl_Byte_15;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0xB6(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0xB6(void)
+{
+    AppCom_CCAN_VCU_0xB6.VCU_BrakeFirstSts               = g_Ped_BrkFirstSts;
+    AppCom_CCAN_VCU_0xB6.VCU_MDriverRequireTorque        = g_Stability_DriverRMotTrqReq;
+    AppCom_CCAN_VCU_0xB6.VCU_SDriverRequireTorque        = g_Stability_DriverFMotTrqReq;
+    AppCom_CCAN_VCU_0xB6.VCU_BrakeLightReq               = g_SigAggr_BrkLightReq;
+    AppCom_CCAN_VCU_0xB6.VCU_BrakePedalSts               = g_Ped_BrkPedSts_Can;
+    AppCom_CCAN_VCU_0xB6.VCU_BrakePedalStsValid          = g_Ped_BrkPedStsValid;
+    AppCom_CCAN_VCU_0xB6.VCU_SDrvRequestTorque_IDB6_CCAN = g_RpmAdj_FMotTrqReq;
+    AppCom_CCAN_VCU_0xB6.VCU_MDrvRequestTorque_IDB6_CCAN = g_RpmAdj_RMotTrqReq;
+    AppCom_CCAN_VCU_0xB6.VCU_BrakeSysFault_IDB6_CCAN     = g_Ped_BrakeSysFault;
+    AppCom_CCAN_VCU_0xB6.VCU_AccPedalValid_IDB6_CCAN     = g_Ped_AccPedFaultSts;
+    AppCom_CCAN_VCU_0xB6.VCU_ThrottlePosition_IDB6_CCAN  = g_Ped_AccPedPct;
+    AppCom_CCAN_VCU_0xB6.VCU_GearLevelPosSts_IDB6_CCAN   = g_Gear_GearLevelPosSts;
+    AppCom_CCAN_VCU_0xB6.VCU_DeliveryModeSts_IDB6_CCAN   = g_FuncCfg_DeliveryModeSts;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0xB7(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0xB7(void)
+{
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueCap                = g_BrkSplit_EhbElecWhlTrqLmt;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueAct                = g_Stability_ActBrkRecTrq;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueCap_Q              = g_BrkSplit_EhbElecWhlTrqLmtVd;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueAct_Q              = g_Stability_ActBrkRecTrqVd;
+    AppCom_CCAN_VCU_0xB7.VCU_TheoAccePedalPercent              = g_PedTrq_TheoAccePedalPosition;
+    AppCom_CCAN_VCU_0xB7.VCU_TheoAccePedalValid                = g_PedTrq_TheoAccePedalValid;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueTarget_Drag_Q      = g_PedTrq_TarSlipRecTrqVd;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueTarget_Drag        = g_PedTrq_TarSlipRecTrq;
+    AppCom_CCAN_VCU_0xB7.VCU_ParkingReqToEPB                   = g_SigAggr_ParkReq2Epb;
+    AppCom_CCAN_VCU_0xB7.VCU_ACCAvailable                      = g_AccFunc_AccAllowType;
+    AppCom_CCAN_VCU_0xB7.VCU_ACCActiveSts                      = g_AccFunc_AccActiveSts;
+    AppCom_CCAN_VCU_0xB7.VCU_Available_APS                     = g_ApsFunc_ApsAllowType;
+    AppCom_CCAN_VCU_0xB7.VCU_Active_APS                        = g_ApsFunc_ApsActiveSts;
+    AppCom_CCAN_VCU_0xB7.VCU_ESCActive                         = g_Stability_EscFuncActiveSts;
+    AppCom_CCAN_VCU_0xB7.VCU_ESCTorqReqAvailability_Rear       = g_Stability_EscTrqResVd;
+    AppCom_CCAN_VCU_0xB7.VCU_VehicleSpeedVD                    = g_Spd_SpdType;
+    AppCom_CCAN_VCU_0xB7.VCU_CCSStatus                         = g_CcsFunc_CcsActiveSts;
+    AppCom_CCAN_VCU_0xB7.VCU_AutoDriveRequest                  = g_Gear_AutoDriveRequest;
+    AppCom_CCAN_VCU_0xB7.VCU_CCSAllow                          = g_CcsFunc_CcsAllowType;
+    AppCom_CCAN_VCU_0xB7.VCU_HoldReqSts                        = g_SigAggr_HoldReqSts;
+    AppCom_CCAN_VCU_0xB7.VCU_HydraTorqTgt                      = g_BrkSplit_VcuHydWhlTrqReq;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueActDrag            = g_Stability_ActSlipRecTrq;
+    AppCom_CCAN_VCU_0xB7.VCU_HydraTorqTgt_Q                    = g_BrkSplit_VcuHydWhlTrqVd;
+    AppCom_CCAN_VCU_0xB7.VCU_RecuBrakeTorqueActDrag_Q          = g_Stability_ActSlipRecTrqVd;
+    AppCom_CCAN_VCU_0xB7.VCU_PowerReduceReq                    = g_Warn_PwrReduceLv;
+    AppCom_CCAN_VCU_0xB7.VCU_SpeedLimitedSts                   = g_SpdLmt_SpdLmtSts;
+    AppCom_CCAN_VCU_0xB7.VCU_SpeedLimitedValue                 = g_SpdLmt_SpdLmtVal_Can;
+    AppCom_CCAN_VCU_0xB7.VCU_DriverAssistProhibitSts_IDB7_CCAN = g_Gear_AdasForbid;
+    AppCom_CCAN_VCU_0xB7.VCU_Vehicle_Warning_IDB7_CCAN         = g_Warn_VehiWarningLv;
+    AppCom_CCAN_VCU_0xB7.VCU_VehicleSts_IDB7_CCAN              = g_VehiMode_ReadySts;
+    AppCom_CCAN_VCU_0xB7.VCU_ACCAPA_TorqueMax                  = g_AccFunc_TorqueMax;
+    AppCom_CCAN_VCU_0xB7.VCU_ACCAPA_TorqueMax_VD               = g_AccFunc_TorqueMax_VD;
+    AppCom_CCAN_VCU_0xB7.VCU_ESCTorqReqAvailability_Rear       = g_Stability_ESCTorqReqAvailability;
+    AppCom_CCAN_VCU_0xB7.VCU_PreventVehSlipSts                 = g_SigAggr_HACActiveSts;
+
+    AppCom_CCAN_VCU_0xB7.VCU_VlcHoldSts                        = g_SigAggr_StopHoldSts;
+    AppCom_CCAN_VCU_0xB7.VCU_HoldReqStsValid                   = g_SigAggr_HoldReqStsValid;
+
+    /* TODO:signal new add,need VCU to check*/
+//        AppCom_CCAN_TxMsg_0xB7_Core2.VCU_HoldReqStsValid;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0x1FF(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x1FF(void)
+{
+	AppCom_CCAN_VCU_0x1FF.VCU_Wakeup_IBC_CANFD = g_Gear_PWakeEsc;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuTxDataHandle_0x1FE(void)
+* Description  : fetch data from the app to bus.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuTxDataHandle_0x1FE(void)
+{
+	AppCom_CCAN_VCU_0x1FE.VCU_Wakeup_IBC_CAN = g_Gear_PWakeEsc;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ICU_0x24C (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ICU_0x24C (void)
+{
+    g_ICU_CreepMode = AppCom_PCAN_ICU_0x24C.ICU_CreepMode;
+    g_ICU_DrvMode   = AppCom_PCAN_ICU_0x24C.ICU_AccelerationMode;
+    g_ICU_RecMode   = AppCom_PCAN_ICU_0x24C.ICU_EnergyRecoveryMode;
+    g_ICU_REMode    = AppCom_PCAN_ICU_0x24C.ICU_REMode;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ICU_0x249 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ICU_0x249 (void)
+{
+    g_ICU_CLTC_oilMileage         = AppCom_PCAN_ICU_0x249.ICU_CLTCoilMileage;
+    g_ICU_CLTC_ElectricityMileage = AppCom_PCAN_ICU_0x249.ICU_CLTC_ElectticityMileage;
+    g_ICU_WLTC_oilMileage         = AppCom_PCAN_ICU_0x249.ICU_WLTC_oilMileage;
+    g_ICU_WLTC_ElectricityMileage = AppCom_PCAN_ICU_0x249.ICU_WLTC_ElectticityMileage;
+    g_ICU_Switch_CLTCorWLTC       = AppCom_PCAN_ICU_0x249.ICU_Switch_CLTCOrWLTC;
+    g_ICU_FuelPercent             = AppCom_PCAN_ICU_0x249.ICU_FuelPercent;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_GW_0x30B (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_GW_0x30B (void)
+{
+    g_TCM_GearLevelSwitchSts = AppCom_PCAN_GW_0x30B.GW_TCM_GearLevelSwitchSts;
+    g_TCM_ParkingSwSts       = AppCom_PCAN_GW_0x30B.GW_TCM_ParkingSwSts;
+    g_TCM_Status_Park        = AppCom_PCAN_GW_0x30B.GW_TCM_STATUS_Park;
+    g_TCM_Counter_Park       = AppCom_PCAN_GW_0x30B.GW_TCM_Counter_Park;
+    g_TCM_Crc_Park           = AppCom_PCAN_GW_0x30B.GW_TCM_CRC_Park;
+    g_TCM_Status_Rnd         = AppCom_PCAN_GW_0x30B.GW_TCM_STATUS_RND;
+    g_TCM_Counter_Rnd        = AppCom_PCAN_GW_0x30B.GW_TCM_Counter_RND;
+    g_TCM_Crc_Rnd            = AppCom_PCAN_GW_0x30B.GW_TCM_CRC_RND;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_GW_0x3B1 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_GW_0x3B1 (void)
+{
+    g_CCM_CcmPwr                = AppCom_PCAN_GW_0x3B1.GW_CCM_Power;
+    g_PTC_PtcPwr                = AppCom_PCAN_GW_0x3B1.GW_PTC_Power;
+    g_PTC_PtcHvilSts            = AppCom_PCAN_GW_0x3B1.GW_PTC_HV_interlock_faultSt;
+    g_TBOX_Altitude             = AppCom_PCAN_GW_0x3B1.GW_TBOXSOC_Altitude;
+    g_TMS_OutsideTempVD         = AppCom_PCAN_GW_0x3B1.GW_TMS_OutsideTempVD;
+    g_TMS_OutsideTemp_Corrected = AppCom_PCAN_GW_0x3B1.GW_TMS_OutsideTemp_Corrected;
+    g_TMS_AC_Command            = AppCom_PCAN_GW_0x3B1.GW_TMS_AC_Command;
+    g_TMS_PTCHeatingReq         = AppCom_PCAN_GW_0x3B1.GW_TMS_PTCHeatingReq;
+    g_TMS_MilLampReq            = AppCom_PCAN_GW_0x3B1.GW_TMS_MilLampReq;
+    g_BZCU_DcChgPortTempP       = AppCom_PCAN_GW_0x3B1.GW_BZCU_DCChgExitTemp_Pos;
+    g_BZCU_DcChgPortTempN       = AppCom_PCAN_GW_0x3B1.GW_BZCU_DCChgExitTemp_Neg;
+    g_BZCU_AcChgPortTempP       = AppCom_PCAN_GW_0x3B1.GW_BZCU_ACChgExitTemp_Pos;
+    g_BZCU_AcChgPortTempN       = AppCom_PCAN_GW_0x3B1.GW_BZCU_ACChgExitTemp_Neg;
+    g_BZCU_AcChgLockSts         = AppCom_PCAN_GW_0x3B1.GW_BZCU_ACChgLockSts;
+    g_BZCU_FuelTankSts          = AppCom_PCAN_GW_0x3B1.GW_BZCU_FuelTankSts;
+    /* TODO:signal new add,need VCU to check */
+//        g_xxx = AppCom_PCAN_RxMsg_0x3B1_Core2.GW_PTC_BscSts;
+//        g_xxx = AppCom_PCAN_RxMsg_0x3B1_Core2.GW_CCM_BaseState;
+//        g_xxx = AppCom_PCAN_RxMsg_0x3B1_Core2.GW_CCM_APTC_BscSts;
+
+
+}
+
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BMS_0x1A1 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BMS_0x1A1 (void)
+{
+    g_BMS_FMcuHvilSts      = AppCom_PCAN_BMS_0x1A1.BMS_FMCUHVILSts;
+    g_BMS_RMcuHvilSts      = AppCom_PCAN_BMS_0x1A1.BMS_RMCUHVILSts;
+    g_BMS_DcChgHvilSts     = AppCom_PCAN_BMS_0x1A1.BMS_DCChgHVILSts;
+    g_BMS_PtcHvilSts       = AppCom_PCAN_BMS_0x1A1.BMS_PTCHVILSts;
+    g_BMS_CcmHvilSts       = AppCom_PCAN_BMS_0x1A1.BMS_CCMHVILSts;
+    g_BMS_CduHvilSts       = AppCom_PCAN_BMS_0x1A1.BMS_CDUHVILSts;
+    g_BMS_SelfCheck        = AppCom_PCAN_BMS_0x1A1.BMS_SelfCheck;
+    g_BMS_WarningLv        = AppCom_PCAN_BMS_0x1A1.BMS_Warning_Level;
+    g_BMS_IsoRessistLv     = AppCom_PCAN_BMS_0x1A1.BMS_IsoRessistanceSts;
+    g_BMS_HighVoltSts      = AppCom_PCAN_BMS_0x1A1.BMS_RHighVolSts;
+    g_BMS_NegativeRelayFb  = AppCom_PCAN_BMS_0x1A1.BMS_RNegativeRelayFB;
+    g_BMS_PositiveRelayFb  = AppCom_PCAN_BMS_0x1A1.BMS_RPositiveRelayFB;
+    g_BMS_PreChgFinishSts  = AppCom_PCAN_BMS_0x1A1.BMS_RPreChargeFinishSts;
+    g_BMS_DCChgRelayFB     = AppCom_PCAN_BMS_0x1A1.BMS_DCChgRelayFB;
+    g_BMS_BattChgSts       = AppCom_PCAN_BMS_0x1A1.BMS_BattChargerSts;
+    g_BMS_GCUHVILSts       = AppCom_PCAN_BMS_0x1A1.BMS_GCUHVILSts;
+    g_BMS_MILlampReq       = AppCom_PCAN_BMS_0x1A1.BMS_MILlampReq;
+    g_BMS_BattVolt         = AppCom_PCAN_BMS_0x1A1.BMS_BattVolt;
+    g_BMS_BattCurr         = AppCom_PCAN_BMS_0x1A1.BMS_BattCurr;
+    g_BMS_BattMaxDischgPwr = AppCom_PCAN_BMS_0x1A1.BMS_BattMaxDischargePower;
+    g_BMS_BattMaxChgPwr    = AppCom_PCAN_BMS_0x1A1.BMS_BatDyn_Chgpwr;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BMS_0x310 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BMS_0x310 (void)
+{
+    g_BMS_BattMinTemp          = AppCom_PCAN_BMS_0x310.BMS_BattMinTemp;
+    g_BMS_MaxChargeCurr        = AppCom_PCAN_BMS_0x310.BMS_MaxChargeCurr;
+    g_BMS_MaxPower             = AppCom_PCAN_BMS_0x310.BMS_MaxPower;
+    g_BMS_ChargerAcInput       = AppCom_PCAN_BMS_0x310.BMS_ChargerACInput;
+    g_BMS_ChargerDcInput       = AppCom_PCAN_BMS_0x310.BMS_ChargerDCInput;
+    g_BMS_InverterRequest      = AppCom_PCAN_BMS_0x310.BMS_InverterRequest;
+    g_BMS_ChargeRequest        = AppCom_PCAN_BMS_0x310.BMS_ChargeRequest;
+    g_BMS_BattSOC              = AppCom_PCAN_BMS_0x310.BMS_BattSOC_Display;
+    g_BMS_ThermalManageRequest = AppCom_PCAN_BMS_0x310.BMS_ThermalManageRequest;
+    g_BMS_PreHeatingSts        = AppCom_PCAN_BMS_0x310.BMS_PreHeatingState;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BMS_0x5B5 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BMS_0x5B5 (void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    BMS_Msg.HVPackPosRelayExternalVolt = (uint16)AppCom_PCAN_BMS_0x5B5.BMS_HVPackPosRelayExternalVolt;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BMS_0x5B1 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BMS_0x5B1 (void)
+{
+    g_BMS_VoltLoDeratLevel = AppCom_PCAN_BMS_0x5B1.BMS_VoltLoDeratLevel_NA;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_EVCC_0x260 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_EVCC_0x260 (void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    AppCom_PCAN_EVCC_0x260.EVCC_DCAC_ChgMode;
+//    AppCom_PCAN_EVCC_0x260.EVCC_CP_status;
+//    AppCom_PCAN_EVCC_0x260.EVCC_CPDutyCycleValue;
+//    AppCom_PCAN_EVCC_0x260.EVCC_EVSEMaximumCurrentLimit;
+//    AppCom_PCAN_EVCC_0x260.EVCC_EVSEMaximumPowerLimit;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_OBC_0x316 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_OBC_0x316 (void)
+{
+    g_OBC_WorkSts      = AppCom_PCAN_OBC_0x316.OBC_WorkSts;
+//    g_OBC_AcVolt       = AppCom_PCAN_OBC_0x316.OBC_ACVolt;
+//    g_OBC_AcCurr       = AppCom_PCAN_OBC_0x316.OBC_ACCurr;
+    g_OBC_DcVolt       = AppCom_PCAN_OBC_0x316.OBC_DCVolt;
+    g_OBC_DcCurr       = AppCom_PCAN_OBC_0x316.OBC_DCCurr;
+    g_OBC_CcConnectSts = AppCom_PCAN_OBC_0x316.OBC_CCConnectSts;
+//    g_OBC_AcMaxPwr     = AppCom_PCAN_OBC_0x316.OBC_ACMaxPower;
+}
+
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_DCDC_0x324 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_DCDC_0x324 (void)
+{
+    g_DCDC_WorkSts        = AppCom_PCAN_DCDC_0x324.DCDC_WorkSts;
+    g_DCDC_RealVoltIntput = AppCom_PCAN_DCDC_0x324.DCDC_Real_Input_Voltage;
+    g_DCDC_RealCurrIntput = AppCom_PCAN_DCDC_0x324.DCDC_Real_Input_Current;
+    g_DCDC_RealVoltOutput = AppCom_PCAN_DCDC_0x324.DCDC_Real_Output_Voltage;
+    g_DCDC_RealCurrOutput = AppCom_PCAN_DCDC_0x324.DCDC_Real_Output_Current;
+    g_DCDC_AcChgHvilSts   = AppCom_PCAN_DCDC_0x324.CDU_ACChg_HIVSts;
+    g_DCDC_CduHvilSts     = AppCom_PCAN_DCDC_0x324.CDU_HV_HIVSts;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ECM_0x148 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ECM_0x148 (void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    AppCom_PCAN_ECM_0x148.ECM_SWVersionC;
+//    AppCom_PCAN_ECM_0x148.ECM_SWVersionB;
+//    AppCom_PCAN_ECM_0x148.ECM_SWVersionA;
+//    AppCom_PCAN_ECM_0x148.ECM_Total_fuel_consumed;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ECM_0x5EC (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ECM_0x5EC (void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    AppCom_PCAN_ECM_0x5EC.ECM_EngineWorktime;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_EMS_0xBE (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_EMS_0xBE (void)
+{
+    g_EMS_EngineSts                  = AppCom_PCAN_EMS_0xBE.EMS_EngineSts;
+    g_EMS_FaultLevel                 = AppCom_PCAN_EMS_0xBE.ECM_FaultLevel;
+    g_EMS_EngineTorqueMax            = AppCom_PCAN_EMS_0xBE.ECM_EngineTorqueMax;
+    g_EMS_EngineSpeed                = AppCom_PCAN_EMS_0xBE.ECM_EngineSpeed;
+    g_EMS_EngineSpeedValid           = AppCom_PCAN_EMS_0xBE.ECM_EngineSpeedValid;
+    g_EMS_EngineStopAllow            = AppCom_PCAN_EMS_0xBE.ECM_EngineStopAllow;
+    g_EMS_EngineOilPressureLow       = AppCom_PCAN_EMS_0xBE.ECM_EngineOilPressureLow;
+    g_EMS_EngineFuleCutoffSts        = AppCom_PCAN_EMS_0xBE.ECM_EngineFuleCutoffSts;
+    g_EMS_EngineStartedCompleted     = AppCom_PCAN_EMS_0xBE.ECM_EngineStartedCompleted;
+    g_EMS_CatalystWarmUpReq          = AppCom_PCAN_EMS_0xBE.ECM_CatalystWarmUpReq;
+    g_EMS_EngineCoolantTemp          = AppCom_PCAN_EMS_0xBE.ECM_EngineCoolantTemp;
+    g_EMS_EngineCoolantTempValid     = AppCom_PCAN_EMS_0xBE.ECM_EngineCoolantTempValid;
+    g_EMS_FVVSts                     = AppCom_PCAN_EMS_0xBE.ECM_FVVSts;
+    g_EMS_learningReq                = AppCom_PCAN_EMS_0xBE.ECM_learningReq;
+    g_EMS_EngineIdleStateRequest     = AppCom_PCAN_EMS_0xBE.ECM_EngineIdleStateRequest;
+    g_EMS_EngineDFCOConditionRequest = AppCom_PCAN_EMS_0xBE.ECM_EngineDFCOConditionRequest;
+    g_EMS_MilLampRequest             = AppCom_PCAN_EMS_0xBE.ECM_MilLampRequest;
+    g_EMS_TankPressure               = AppCom_PCAN_EMS_0xBE.ECM_TankPressure;
+    g_EMS_TankPressureValid          = AppCom_PCAN_EMS_0xBE.ECM_TankPressureValid;
+    g_EMS_FuelLevel                  = AppCom_PCAN_EMS_0xBE.ECM_FuelLevel;
+    g_EMS_AirPressure                = AppCom_PCAN_EMS_0xBE.ECM_AirPressure;
+    g_EMS_CalculatedLoad             = AppCom_PCAN_EMS_0xBE.ECM_CalculatedLoad;
+    g_EMS_RestrictorOpenValue        = AppCom_PCAN_EMS_0xBE.ECM_RestrictorOpenValue;
+    g_EMS_EngineStartReq             = AppCom_PCAN_EMS_0xBE.ECM_EngineStartReq;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_GCU_0xBD (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_GCU_0xBD (void)
+{
+    g_GCU_MainWireCurr       = AppCom_PCAN_GCU_0xBD.GCU_MainWireCurr;
+    g_GCU_MainWireVolt       = AppCom_PCAN_GCU_0xBD.GCU_MainWireVolt;
+    g_GCU_MILlampReq         = AppCom_PCAN_GCU_0xBD.GCU_MILlampReq;
+    g_GCU_SelfCheck          = AppCom_PCAN_GCU_0xBD.GCU_SelfCheck;
+    g_GCU_Warning_Level      = AppCom_PCAN_GCU_0xBD.GCU_Warning_Level;
+    g_GCU_HVILStsAC          = AppCom_PCAN_GCU_0xBD.GCU_HVILSts;
+    g_GCU_PowerReduceSts     = AppCom_PCAN_GCU_0xBD.GCU__PowerReduceSts;
+    g_GCU_ActualMotorTorque  = AppCom_PCAN_GCU_0xBD.GCU_ActualMotorTorque;
+    g_GCU_MaxTorque          = AppCom_PCAN_GCU_0xBD.GCU_MaxTorque;
+    g_GCU_ActualMotorRPM     = AppCom_PCAN_GCU_0xBD.GCU_ActualMotorRPM;
+    g_GCU_ActualMotorRPM_VD  = AppCom_PCAN_GCU_0xBD.GCU_ActualMotorRPM_VD;
+    g_GCU_HVOffReq           = AppCom_PCAN_GCU_0xBD.GCU_HVOffReq;
+    g_GCU_ActiveReleaseFB    = AppCom_PCAN_GCU_0xBD.GCU_ActiveReleaseFB;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_GCU_0x2C1 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_GCU_0x2C1 (void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    AppCom_PCAN_GCU_0x2C1.GCU_SWVersionC;
+//    AppCom_PCAN_GCU_0x2C1.GCU_SWVersionB;
+//    AppCom_PCAN_GCU_0x2C1.GCU_SWVersionA;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IVI_0x5F6 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IVI_0x5F6 (void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    g_IVI_Year  = AppCom_PCAN_IVI_0x5F6.IVI_Year;
+//    g_IVI_Month = AppCom_PCAN_IVI_0x5F6.IVI_Month;
+//    g_IVI_Data  = AppCom_PCAN_IVI_0x5F6.IVI_Data;
+//    AppCom_PCAN_IVI_0x5F6.IVI_Hour;
+//    AppCom_PCAN_IVI_0x5F6.IVI_Minute;
+//    AppCom_PCAN_IVI_0x5F6.IVI_Second;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IVI_0x34A (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IVI_0x34A (void)
+{
+    g_IVI_ShowCarModeReq  = AppCom_PCAN_IVI_0x34A.IVI_ShowCarModeReq;
+    g_IVI_DeliveryModeReq = AppCom_PCAN_IVI_0x34A.IVI_DeliveryModeReq;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IVI_0x3D8 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IVI_0x3D8 (void)
+{
+    g_IVI_FuelupReq                 = AppCom_PCAN_IVI_0x3D8.IVI_FuelupReq;
+    g_IVI_InventerLimitOdometerkmVD = AppCom_PCAN_IVI_0x3D8.IVI_InventerLimitOdometerkmVD;
+    g_IVI_InventerLimitOdometerkm   = AppCom_PCAN_IVI_0x3D8.IVI_InventerLimitOdometerkm;
+    g_IVI_EMSRepairModeReq          = AppCom_PCAN_IVI_0x3D8.IVI_EMSRepairModeReq;
+    g_IVI_ForceChgModeReq           = AppCom_PCAN_IVI_0x3D8.IVI_ForceChgModeReq;
+    g_IVI_ForceChgTargetSOCVD       = AppCom_PCAN_IVI_0x3D8.IVI_ForceChgTargetSOCVD;
+    g_IVI_ForceChgTargetSOC         = AppCom_PCAN_IVI_0x3D8.IVI_ForceChgTargetSOC;
+    g_IVI_FuelDetMode               = AppCom_PCAN_IVI_0x3D8.IVI_FuelDetMode;
+    g_IVI_EngineIdlingMode          = AppCom_PCAN_IVI_0x3D8.IVI_EngineIdlingMode;
+    g_IVI_SpdLimReq                 = AppCom_PCAN_IVI_0x3D8.IVI_SpeedLimitModeSW;
+    g_IVI_SpdLimSet                 = AppCom_PCAN_IVI_0x3D8.IVI_SpeedLimitModeSpeed;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BCM_0x291 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BCM_0x291 (void)
+{
+    g_BCM_KeyPositionOn1A    = AppCom_PCAN_BCM_0x291.BCM_KeyPosition_ON1A;
+    g_BCM_KeyPositionOn2A    = AppCom_PCAN_BCM_0x291.BCM_KeyPosition_ON2A;
+    g_BCM_KeyPositionOn3     = AppCom_PCAN_BCM_0x291.BCM_KeyPosition_ON3;
+    g_BCM_KeyPositionOn1B    = AppCom_PCAN_BCM_0x291.BCM_KeyPosition_ON1B;
+    g_BCM_KeyPositionOn3FB   = AppCom_PCAN_BCM_0x291.BCM_KeyPosition_ON3_FB;
+    g_BCM_VehiRepairMode     = AppCom_PCAN_BCM_0x291.BCM_VehicleRepairMode;
+    g_BCM_On2AInitiactiveSts = AppCom_PCAN_BCM_0x291.BCM_ON2InitiativeSts;
+    g_BCM_DCChrgPwr_Sts      = AppCom_PCAN_BCM_0x291.BCM_DCChrgPwr_Sts_ID291;
+    g_BCM_ACChrgPwr_Sts      = AppCom_PCAN_BCM_0x291.BCM_ACChrgPwr_Sts_ID291;
+    g_BCM_DCChrgPwr_Volt     = AppCom_PCAN_BCM_0x291.BCM_DCChrgPwr_Volt_ID291;
+    g_BCM_ACChrgPwr_Volt     = AppCom_PCAN_BCM_0x291.BCM_ACChrgPwr_Volt_ID291;
+    g_BCM_CcmHvilSts         = AppCom_PCAN_BCM_0x291.BCM_CcmHvilSts_ID291;
+    g_BCM_KeyPositionOn2BFB  = AppCom_PCAN_BCM_0x291.BCM_ON2BRelaySts;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BCM_0x292 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BCM_0x292(void)
+{
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_MCUS_0xDB (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_MCUS_0xDB (void)
+{
+    g_FMCU_MotRpm           = AppCom_PCAN_MCUS_0xDB.FMCU_DrvMotorRPM;
+    g_FMCU_MotRpmVd         = AppCom_PCAN_MCUS_0xDB.FMCU_HWRdcFault;
+    g_FMCU_SelfCheckSts     = AppCom_PCAN_MCUS_0xDB.FMCU_SelfCheckSts;
+    g_FMCU_WarningLv        = AppCom_PCAN_MCUS_0xDB.FMCU_WarningLevel;
+    g_FMCU_HvPwrOffReq      = AppCom_PCAN_MCUS_0xDB.FMCU_HighVoltPowerOffReq;
+    g_FMCU_MotorSts         = AppCom_PCAN_MCUS_0xDB.FMCU_DragSts;
+    g_FMCU_MotTrq           = AppCom_PCAN_MCUS_0xDB.FMCU_ActualTorqueFB;
+    g_FMCU_ActiveReleaseSts = AppCom_PCAN_MCUS_0xDB.FMCU_ActiveReleaseSts;
+    g_FMCU_MaxTrqAllow      = AppCom_PCAN_MCUS_0xDB.FMCU_MaxTorqueAllow;
+    g_FMCU_MaxRpmAllow      = AppCom_PCAN_MCUS_0xDB.FMCU_MaxSpeedAllow;
+    g_FMCU_MainVolt         = AppCom_PCAN_MCUS_0xDB.FMCU_MainWireVolt;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_BCM_0x290(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_BCM_0x290(void)
+{
+    g_RZCU_FrontCoverStsH   = AppCom_CCAN_BCM_0x290.BCM_FrontCoverSts;
+    g_BCM_AlarmMode         = AppCom_CCAN_BCM_0x290.BCM_AlarmMode_C;
+    g_BCM_DriverDoorSts     = AppCom_CCAN_BCM_0x290.BCM_DriverDoorSts_ID290_CCAN;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ICU_0x24D(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ICU_0x24D(void)
+{
+    g_ICU_CcsTarSpd        = AppCom_CCAN_ICU_0x24D.ICU_CruiseVehicleSpeedCtl;
+    g_ICU_CcsFuncSts       = AppCom_CCAN_ICU_0x24D.ICU_CCSFunctionStatus;
+    g_IVI_LPedalMode       = AppCom_CCAN_ICU_0x24D.IVI_LPedalMode;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ICU_0x24D(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ICU_0x332(void)
+{
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IVI_0x331(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IVI_0x331(void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+//    AppCom_PCAN_RxMsg_0x331.IVI_CRC_331;
+//    AppCom_PCAN_RxMsg_0x331.IVI_RollingCounter_331;
+//    AppCom_PCAN_RxMsg_0x331.IVI_AutoHoldEnable;
+//    AppCom_PCAN_RxMsg_0x331.IVI_ESCEnable;
+//    AppCom_PCAN_RxMsg_0x331.IVI_HDCEnable;
+//    AppCom_PCAN_RxMsg_0x331.IVI_ComfortBrakeStopSw;
+//    AppCom_PCAN_RxMsg_0x331.IVI_EPBRequst;
+//    AppCom_PCAN_RxMsg_0x331.IVI_TerrainMatchMode;
+//    AppCom_PCAN_RxMsg_0x331.IVI_AutoAllRoad;
+//    AppCom_PCAN_RxMsg_0x331.IVI_CampingMode_SW;
+//    AppCom_PCAN_RxMsg_0x331.IVI_BraPedMod;
+//    AppCom_PCAN_RxMsg_0x331.IVI_SlowspeedSmartCtrl;
+//    AppCom_PCAN_RxMsg_0x331.IVI_TrailerModeCtrl;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ACU_0x2A3 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ACU_0x2A3(void)
+{
+    g_ACU_CrashOutputSts = AppCom_CCAN_ACU_0x2A3.ACU_TotalCrashOutputSts;
+
+    g_ACU_FRSeatBeltRSt =  AppCom_CCAN_ACU_0x2A3.ACU_FRSeatBeltRSt;
+    g_ACU_FLSeatBeltRSt = AppCom_CCAN_ACU_0x2A3.ACU_FLSeatBeltRSt;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ACU_0x233(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ACU_0x233(void)
+{
+    g_ESC_LongitAccnVd = AppCom_CCAN_ACU_0x233.ACU_LongitAcceValid;
+    g_ESC_LongitAccn   = AppCom_CCAN_ACU_0x233.ACU_LongitAcce;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_EPS_0x18D(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_EPS_0x18D(void)
+{
+    g_EPS_SteerWheelAngleVd = AppCom_CCAN_EPS_0x18D.EPS_SteeringAngleValidData;
+    g_EPS_SteerWheelAngle   = AppCom_CCAN_EPS_0x18D.EPS_SteerWheelAngle;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IBC_0x182 (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IBC_0x182(void)
+{
+    g_ESC_VehiSpd    = AppCom_CCAN_IBC_0x182.IBC_VehicleSpeed;
+    g_ESC_VehiSpdVd  = AppCom_CCAN_IBC_0x182.IBC_VehicleSpeedVD;
+    g_ESC_EspFuncSts = AppCom_CCAN_IBC_0x182.IBC_ESCFunctionStatus;
+    g_ESC_EspActive  = AppCom_CCAN_IBC_0x182.IBC_VDCActive;
+    g_ESC_EspFailed  = AppCom_CCAN_IBC_0x182.IBC_VDCFailed;
+    g_ESC_AbsActive  = AppCom_CCAN_IBC_0x182.IBC_ABSActive;
+    g_ESC_AbsFailed  = AppCom_CCAN_IBC_0x182.IBC_ABSFailed;
+    g_ESC_TcsActive  = AppCom_CCAN_IBC_0x182.IBC_TCSActive;
+    g_ESC_eMSRActive = AppCom_CCAN_IBC_0x182.IBC_EDCActive;
+    g_ESC_TcsFailed  = AppCom_CCAN_IBC_0x182.IBC_TCSFailed;
+    g_ESC_EbdFailed  = AppCom_CCAN_IBC_0x182.IBC_EBDFailed;
+    g_ESC_EdcFailed  = AppCom_CCAN_IBC_0x182.IBC_EDCFailed;
+    g_ESC_EbdActive  = AppCom_CCAN_IBC_0x182.IBC_EBDActive;
+
+    /*TODO: The following signal need to be used by VCU*/
+//    g_IBC_EscapeModeSts  = AppCom_CCAN_IBC_0x182.IBC_EscapeModeSts;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IBC_0x183(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IBC_0x183(void)
+{
+    g_EHB_BrkPedPct         = AppCom_CCAN_IBC_0x183.IBC_sOutputRodDriverPer;
+    g_EHB_BrkPedPctVd       = AppCom_CCAN_IBC_0x183.IBC_sOutputRodDriverPer_Q;
+    g_EHB_BrkPedApplySts    = AppCom_CCAN_IBC_0x183.IBC_BrakePedalApplied;
+    g_EHB_BrkPedApplyVd     = AppCom_CCAN_IBC_0x183.IBC_BrakePedalApplied_Q;
+    g_EHB_BrkRecTrqReq      = AppCom_CCAN_IBC_0x183.IBC_RecuBrakeTorqueRequest;
+    g_EHB_BrkRecTrqReqVd    = AppCom_CCAN_IBC_0x183.IBC_RecuBrakeTorqueRequest_Q;
+    g_EHB_BrkCompTrqFb      = AppCom_CCAN_IBC_0x183.IBC_HydraTorqTgtAct;
+    g_EHB_BrkCompTrqFbVd    = AppCom_CCAN_IBC_0x183.IBC_HydraTorqTgtAct_Q;
+//	g_IBC_EngTorq_VLC       = AppCom_CCAN_IBC_0x183.IBC_EngTorq_VLC;
+//	g_IBC_EngTorq_VLC_Vaild = AppCom_CCAN_IBC_0x183.IBC_EngTorq_VLC_Vaild;
+//	g_IBC_BrkTorq_VLC       = AppCom_CCAN_IBC_0x183.IBC_BrkTorq_VLC;
+//	g_IBC_BrkTorq_VLC_Vaild = AppCom_CCAN_IBC_0x183.IBC_BrkTorq_VLC_Vaild;
+
+    /* TODO:signal new add,need VCU to check */
+//        AppCom_CCAN_RxMsg_0x183_Core2.IBC_HydraTorqAvailable;
+//        AppCom_CCAN_RxMsg_0x183_Core2.IBC_QDC_HydraTorqTgt;
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IBC_0x184(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IBC_0x184(void)
+{
+    g_ESC_FLWheelSpd       = AppCom_CCAN_IBC_0x184.IBC_FLWheelSpeedKPH;
+    g_ESC_FLWheelDirection = AppCom_CCAN_IBC_0x184.IBC_FLWheelDirection;
+    g_ESC_FLWheelSpdVd     = AppCom_CCAN_IBC_0x184.IBC_FLWheelSpeedVD;
+    g_ESC_FRWheelSpd       = AppCom_CCAN_IBC_0x184.IBC_FRWheelSpeedKPH;
+    g_ESC_FRWheelDirection = AppCom_CCAN_IBC_0x184.IBC_FRWheelDirection;
+    g_ESC_FRWheelSpdVd     = AppCom_CCAN_IBC_0x184.IBC_FRWheelSpeedVD;
+    g_ESC_FLWheelSpdRC     = AppCom_CCAN_IBC_0x184.IBC_FLWheelSpeedRC;
+    g_ESC_FRWheelSpdRC     = AppCom_CCAN_IBC_0x184.IBC_FRWheelSpeedRC;
+    g_ESC_RLWheelSpdRC     = AppCom_CCAN_IBC_0x184.IBC_RLWheelSpeedRC;
+    g_ESC_RRWheelSpdRC     = AppCom_CCAN_IBC_0x184.IBC_RRWheelSpeedRC;
+    g_ESC_RLWheelSpd       = AppCom_CCAN_IBC_0x184.IBC_RLWheelSpeedKPH;
+    g_ESC_RLWheelDirection = AppCom_CCAN_IBC_0x184.IBC_RLWheelDirection;
+    g_ESC_RLWheelSpdVd     = AppCom_CCAN_IBC_0x184.IBC_RLWheelSpeedVD;
+    g_ESC_RRWheelSpd       = AppCom_CCAN_IBC_0x184.IBC_RRWheelSpeedKPH;
+    g_ESC_RRWheelDirection = AppCom_CCAN_IBC_0x184.IBC_RRWheelDirection;
+    g_ESC_RRWheelSpdVd     = AppCom_CCAN_IBC_0x184.IBC_RRWheelSpeedVD;
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IBC_0x185(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IBC_0x185(void)
+{
+    g_ESC_HMI_WarningOn       = AppCom_CCAN_IBC_0x185.IBC_HMI_WarningOn;
+    g_EHB_HMI_WarningOn       = AppCom_CCAN_IBC_0x185.IBC_HMI_WarningOn;
+    g_VCU_EHBMilLampRequest   = AppCom_CCAN_IBC_0x185.IBC_HMI_WarningOn;
+    g_ESC_McylinderPressure   = AppCom_CCAN_IBC_0x185.IBC_PlungerPressure;
+    g_ESC_McylinderPressureVd = AppCom_CCAN_IBC_0x185.IBC_PlungerPressure_Q;
+    g_ESC_HdcAvailable        = AppCom_CCAN_IBC_0x185.IBC_HDCAvailable;
+    g_ESC_HdcStatus           = AppCom_CCAN_IBC_0x185.IBC_HDCStatus;
+    g_ESC_AvhStatus           = AppCom_CCAN_IBC_0x185.IBC_AVHStatus;
+    g_ESC_HlaActive           = AppCom_CCAN_IBC_0x185.IBC_HHCActive;
+    g_ESC_CdpActive           = AppCom_CCAN_IBC_0x185.IBC_CDPIntervention;
+    g_ESC_CdpAvailable        = AppCom_CCAN_IBC_0x185.IBC_CDPAvailable;
+    g_ESC_CddActiveAps        = AppCom_CCAN_IBC_0x185.IBC_CDD_Active_APA;
+//    g_ESC_CddAvailableAps     = AppCom_CCAN_IBC_0x185.IBC_CDD_Available_APA;
+    g_ESC_CddActiveAcc        = AppCom_CCAN_IBC_0x185.IBC_CDD_Active_ACC;
+//	g_ESC_CddAvailableAcc     = AppCom_CCAN_IBC_0x185.IBC_CDD_Available_ACC;
+//	g_IBC_VLC_Active_ACC      = AppCom_CCAN_IBC_0x185.IBC_VLC_Active_ACC;
+
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IBC_0xB1(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IBC_0xB1(void)
+{
+    g_ESC_RMotTrqIncActiveSts = AppCom_CCAN_IBC_0xB1.IBC_EngTorqIncActive_Main;
+    g_ESC_RMotTrqInc          = AppCom_CCAN_IBC_0xB1.IBC_EngTorqInc_Main;
+    g_ESC_RMotTrqDecActiveSts = AppCom_CCAN_IBC_0xB1.IBC_EngTorqDecActive_Main;
+    g_ESC_RMotTrqDec          = AppCom_CCAN_IBC_0xB1.IBC_EngTorqDec_Main;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_IBC_0x227(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_IBC_0x227(void)
+{
+    g_EPB_EpbSysSts = AppCom_CCAN_IBC_0x227.IBC_EPB_Status;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_LMC_0xFA(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_LMC_0xFA(void)
+{
+    g_LMC_EngTorqDec_Rear        = AppCom_CCAN_LMC_0xFA.LMC_EngTorqDec_Main;
+    g_LMC_EngTorqDecActive_Rear  = AppCom_CCAN_LMC_0xFA.LMC_EngTorqDecActive_Main;
+    g_LMC_EngTorqInc_Rear        = AppCom_CCAN_LMC_0xFA.LMC_EngTorqInc_Main;
+    g_LMC_EngTorqIncActive_Rear  = AppCom_CCAN_LMC_0xFA.LMC_EngTorqIncActive_Main;
+    g_LMC_EngTorqDec_Front       = AppCom_CCAN_LMC_0xFA.LMC_EngTorqDec_Sub;
+    g_LMC_EngTorqDecActive_Front = AppCom_CCAN_LMC_0xFA.LMC_EngTorqDecActive_Sub;
+    g_LMC_EngTorqInc_Front       = AppCom_CCAN_LMC_0xFA.LMC_EngTorqInc_Sub;
+    g_LMC_EngTorqIncActive_Front = AppCom_CCAN_LMC_0xFA.LMC_EngTorqIncActive_Sub;
+
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_LMC_0xFD (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_LMC_0xFD (void)
+{
+    g_LMC_HSPC_ActiveSt = AppCom_CCAN_LMC_0xFD.LMC_HSPC_ActiveSt;
+    g_LMC_FTSC_ActiveSt = AppCom_CCAN_LMC_0xFD.LMC_FTSC_ActiveSt;
+    g_LMC_SDRM_ActiveSt = AppCom_CCAN_LMC_0xFD.LMC_SDRM_ActiveSt;
+    g_LMC_NSPC_ActiveSt = AppCom_CCAN_LMC_0xFD.LMC_NSPC_ActiveSt;
+    g_LMC_EAF_ActiveSt  = AppCom_CCAN_LMC_0xFD.LMC_EAF_ActiveSt;
+    g_LMC_WBDC_ActiveSt = AppCom_CCAN_LMC_0xFD.LMC_WBDC_ActiveSt;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_LMC_0x25A (void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_LMC_0x25A (void)
+{
+    //AppCom_CCAN_LMC_0x25A.LMC_CRC_25A;
+    //AppCom_CCAN_LMC_0x25A.LMC_RollingCounter_25A;
+    //AppCom_CCAN_LMC_0x25A.LMC_LSFCActiveSt;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ADAS_0x83(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ADAS_0x83(void)
+{
+    g_ACC_AccMode             = AppCom_CCAN_ADDC_0x83.HPCADAS_ACCMode;
+    g_ACC_TarAccnVd           = AppCom_CCAN_ADDC_0x83.HPCADAS_ACCTargetAccVD;
+    g_ACC_TarAccn             = AppCom_CCAN_ADDC_0x83.HPCADAS_ACCTargetAcc;
+    g_ACC_TarSpdVd            = AppCom_CCAN_ADDC_0x83.HPCADAS_VehicleSpeedCtlVD;
+    g_ACC_TarSpd              = AppCom_CCAN_ADDC_0x83.HPCADAS_VehicleSpeedCtl;
+    g_ACC_EpbParkingReq       = AppCom_CCAN_ADDC_0x83.HPCADAS_ACC_EPBReq;
+    g_ACC_DecToStop           = AppCom_CCAN_ADDC_0x83.HPCADAS_DecToStop;
+    g_AEB_DecCtlReq           = AppCom_CCAN_ADDC_0x83.HPCADAS_AEBDecCtrl;
+    g_ACC_VehicleDirectCtl    = AppCom_CCAN_ADDC_0x83.HPCADAS_ACC_VehicleDirectCtl;
+    g_ACC_VehicleDirectCtlVD  = AppCom_CCAN_ADDC_0x83.HPCADAS_ACC_VehicleDirectCtlVD;
+
+    g_ACC_Driveoff            = AppCom_CCAN_ADDC_0x83.HPCADAS_Driveoff_Request;
+    g_ACC_ACCAvailable        = AppCom_CCAN_ADDC_0x83.HPCADAS_ACCAvailable;
+	g_ACC_VLCCtlReq           = AppCom_CCAN_ADDC_0x83.HPCADAS_ACC_VLCCtlReq;
+	g_ACC_OvrdSts             = AppCom_CCAN_ADDC_0x83.HPCADAS_ACC_OvrdSts;
+    /*TODO: The following signal need to be used by VCU*/
+//    g_ACC_TarDecnVd           = AppCom_CCAN_ADDC_0x83.CCAN_083_ADAS_ADAS_ACCTargetDecVD;
+//    g_ACC_TarDecn             = AppCom_CCAN_ADDC_0x83.CCAN_083_ADAS_ADAS_ACCTargetDec;
+}
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_ADAS_0x84(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_ADAS_0x84(void)
+{
+    g_APS_EnableReq       = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_EnableReq;
+    g_APS_TargetAccn      = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_TargetAcc;
+    g_APS_TargetAccnVd    = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_TargetAccVD;
+    g_APS_WorkSts         = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_WorkSts;
+    g_APS_VehiSpdCtlVd    = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_VehicleSpeedCtlVD;
+    g_APS_EmerBrake       = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_EmergenceBrake;
+    g_APS_VehiDirectCtlVd = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_PDCVehicleDirectCtlVD;
+    g_APS_VehiDirectCtl   = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_PDC_VehicleDirectCtl;
+    g_APS_VehiTarSpdCtl   = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_VehicleSpeedCtl;
+    g_APS_ParkingReq      = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_ParkingReq;
+    g_APS_DecToStopReq    = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_DecToStop;
+    g_APS_VehiDirectCtlVD = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_PDCVehicleDirectCtlVD;
+    g_APS_Available       = AppCom_CCAN_ADDC_0x84.HPCADAS_APS_Available;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_FSC_0x142(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_FSC_0x142(void)
+{
+    /*TODO: The following signal need to be used by VCU*/
+    //AppCom_PCAN_RxMsg_0x142.FSC_CRC_142;
+    //AppCom_PCAN_RxMsg_0x142.FSC_RollingCounter_142;
+    //AppCom_PCAN_RxMsg_0x142.FSC_LCC_Mode;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_CommFault(void)
+* Description  : fetch data from the bus to app.
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_CommFault(void)
+{
+    g_CanDiag_MissMsgBms            = AppCom_CommFault_Check.TimeOutErrFlags.flag.BMS;
+    g_CanDiag_RollCntErrBms         = AppCom_CommFault_Check.RollingCntErrFlags.flag.BMS;
+    g_CanDiag_ChksumErrBms          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.BMS;
+    g_CanDiag_MissMsgDcdc           = AppCom_CommFault_Check.TimeOutErrFlags.flag.DCDC;
+    g_CanDiag_RollCntErrDcdc        = AppCom_CommFault_Check.RollingCntErrFlags.flag.DCDC;
+    g_CanDiag_MissMsgObc            = AppCom_CommFault_Check.TimeOutErrFlags.flag.OBC;
+    g_CanDiag_RollCntErrObc         = AppCom_CommFault_Check.RollingCntErrFlags.flag.OBC;
+//    g_CanDiag_ChksumErrObc          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.OBC;
+    g_CanDiag_MissMsgEps            = AppCom_CommFault_Check.TimeOutErrFlags.flag.EPS;
+    g_CanDiag_RollCntErrEps         = AppCom_CommFault_Check.RollingCntErrFlags.flag.EPS;
+    g_CanDiag_ChksumErrEps          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.EPS;
+    g_CanDiag_MissMsgIbc            = AppCom_CommFault_Check.TimeOutErrFlags.flag.IBC;
+    g_CanDiag_RollCntErrIbc         = AppCom_CommFault_Check.RollingCntErrFlags.flag.IBC;
+    g_CanDiag_ChksumErrIbc          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.IBC;
+    g_CanDiag_MissMsgIcu            = AppCom_CommFault_Check.TimeOutErrFlags.flag.ICU;
+    g_CanDiag_RollCntIcu            = AppCom_CommFault_Check.RollingCntErrFlags.flag.ICU;
+    g_CanDiag_ChksumErrIcu          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.ICU;
+    g_CanDiag_MissMsgAcc            = AppCom_CommFault_Check.TimeOutErrFlags.flag.ACC;
+    g_CanDiag_RollCntErrAcc         = AppCom_CommFault_Check.RollingCntErrFlags.flag.ACC;
+    g_CanDiag_ChksumErrAcc          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.ACC;
+    g_CanDiag_MissMsgAps            = AppCom_CommFault_Check.TimeOutErrFlags.flag.APS;
+    g_CanDiag_RollCntErrAps         = AppCom_CommFault_Check.RollingCntErrFlags.flag.APS;
+    g_CanDiag_ChksumErrAps          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.APS;
+    g_CanDiag_MissMsgGcu            = AppCom_CommFault_Check.TimeOutErrFlags.flag.GCU;
+    g_CanDiag_RollCntErrGcu         = AppCom_CommFault_Check.RollingCntErrFlags.flag.GCU;
+    g_CanDiag_ChksumErrGcu          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.GCU;
+    g_CanDiag_MissMsgEms            = AppCom_CommFault_Check.TimeOutErrFlags.flag.EMS;
+    g_CanDiag_RollCntErrEms         = AppCom_CommFault_Check.RollingCntErrFlags.flag.EMS;
+    g_CanDiag_ChksumErrEms          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.EMS;
+    g_CanDiag_RollCntIcu            = AppCom_CommFault_Check.RollingCntErrFlags.flag.ICU;
+    g_CanDiag_ChksumErrIcu          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.ICU;
+    g_CanDiag_MissMsgAcu            = AppCom_CommFault_Check.TimeOutErrFlags.flag.ACU;
+    g_CanDiag_RollCntErrAcu         = AppCom_CommFault_Check.RollingCntErrFlags.flag.ACU;
+    g_CanDiag_ChksumErrAcu          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.ACU;
+    g_CanDiag_MissMsgLmc            = AppCom_CommFault_Check.TimeOutErrFlags.flag.LMC;
+    g_CanDiag_RollCntErrLmc         = AppCom_CommFault_Check.RollingCntErrFlags.flag.LMC;
+    g_CanDiag_ChksumErrLmc          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.LMC;
+    g_CanDiag_MissMsgHpc            = AppCom_CommFault_Check.TimeOutErrFlags.flag.BCM;
+    g_CanDiag_RollCntErrHpc         = AppCom_CommFault_Check.RollingCntErrFlags.flag.BCM;
+    g_CanDiag_ChksumErrHpc          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.BCM;
+    g_CanDiag_MissMsgIvi            = AppCom_CommFault_Check.TimeOutErrFlags.flag.IVI;
+    g_CanDiag_RollCntErrIvi         = AppCom_CommFault_Check.RollingCntErrFlags.flag.IVI;
+    g_CanDiag_ChksumErrIvi          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.IVI;
+    g_CanDiag_MissMsgFMcu           = AppCom_CommFault_Check.TimeOutErrFlags.flag.FMCU;
+    g_CanDiag_RollCntErrFMcu        = AppCom_CommFault_Check.RollingCntErrFlags.flag.FMCU;
+    g_CanDiag_ChksumErrFMcu         = AppCom_CommFault_Check.E2ECrcErrFlags.flag.FMCU;
+    g_CanDiag_MissMsgGw             = AppCom_CommFault_Check.TimeOutErrFlags.flag.GW;
+    g_CanDiag_RollCntErrGw          = AppCom_CommFault_Check.RollingCntErrFlags.flag.GW;
+    g_CanDiag_ChksumErrGw           = AppCom_CommFault_Check.E2ECrcErrFlags.flag.GW;
+    g_CanDiag_MissMsgTcm            = AppCom_CommFault_Check.TimeOutErrFlags.flag.TCM;
+    g_CanDiag_RollCntErrTcm         = AppCom_CommFault_Check.RollingCntErrFlags.flag.TCM;
+    g_CanDiag_ChksumErrTcm          = AppCom_CommFault_Check.E2ECrcErrFlags.flag.TCM;
+    g_CanDiag_CcanBusoff            = AppCom_BusOff_Check.C_CANFD;
+    g_CanDiag_PcanBusoff            = AppCom_BusOff_Check.P_CANFD;
+}
+
+/*********************************************************************************************************************
+* Function name: void AppCom_VcuRxDataHandle_MsgRecvTr(void)
+* Description  :
+* Input        :
+* Output       :
+* Comment      :
+* *******************************************************************************************************************/
+void AppCom_VcuRxDataHandle_MsgRecvTr(AppCom_MsgRecvTr_e e_MsgRecvTr)
+{
+    if(1U == g_VehiMode_VehiHvCmd)
+    {
+        if(APPCOM_NEW_MSG_RECV == AppCom_CommError_Info[AppCom_VcuMsg_RecvTr[e_MsgRecvTr].ErrHandleMsgId].NewMsgRecvFlag)
+        {
+            *AppCom_VcuMsg_RecvTr[e_MsgRecvTr].VcuRecvTrFlag = 1U;
+        }
+    }
+    else
+    {
+        *AppCom_VcuMsg_RecvTr[e_MsgRecvTr].VcuRecvTrFlag = 0U;
+    }
+}
