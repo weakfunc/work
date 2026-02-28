@@ -1,0 +1,297 @@
+g_EolCfg_MotDrvStructure：AppCom_PCAN_VCU_0x359.VCU_EolCfg_MotDrvStructure 
+g_EolCfg_VehiType：AppCom_PCAN_VCU_0x359.VCU_EolCfg_VehiType
+g_EolCfg_Curise：AppCom_PCAN_VCU_0x359.VCU_EolCfg_Curise
+g_EolCfg_APS：AppCom_PCAN_VCU_0x359.VCU_EolCfg_APS
+
+g_RpmAdj_VehiDirect_Can：AppCom_PCAN_VCU_0x13B.VCU_VehicleDirect
+g_RpmAdj_RMotTrqReq：AppCom_CCAN_VCU_0xB6.VCU_MDrvRequestTorque_IDB6_CCAN
+g_RpmAdj_RMotTrqReqVD：AppCom_PCAN_VCU_0x13B.VCU_RDrvRequestTorqueVD 
+g_RpmAdj_VehiDirectVD_Can：AppCom_PCAN_VCU_0x13B.VCU_VehicleDirectVD 
+g_RpmAdj_FMotTrqReq：AppCom_PCAN_VCU_0x13B.VCU_FDrvRequestTorque
+
+g_SigAggr_MotAntiJerkOffReq：AppCom_PCAN_VCU_0x13B.VCU_SuppressJitterRMCURequest
+
+g_Pwr_MotMaxDrvPwr_Can：AppCom_PCAN_VCU_0x13B.VCU_RMCUMaxDischargePower
+g_Pwr_MotMaxRecPwr_Can：AppCom_PCAN_VCU_0x13B.VCU_RMCUMaxChargePower
+g_Pwr_HvacOffReq：AppCom_PCAN_VCU_0x13B.VCU_ACOffReq
+g_Pwr_HvacMaxPwrLmt：AppCom_PCAN_VCU_0x13B.VCU_ACPwrLimited
+
+g_TrqArb_RMotCtlType：AppCom_PCAN_VCU_0x13B.VCU_RDrvControlModeVD
+g_TrqArb_RMotRpmReq：AppCom_PCAN_VCU_0x13B.VCU_RDrvRequesSpeed
+g_TrqArb_RMotCtlTypeVD：AppCom_PCAN_VCU_0x13B.VCU_RDrvControlModeVD
+g_TrqArb_FMotRpmReq：AppCom_PCAN_VCU_0x13B.VCU_FDrvRequesSpeed
+g_TrqArb_FMotCtlType：AppCom_PCAN_VCU_0x13B.VCU_FDrvControlMode
+
+g_VehiMode_ReadySts：AppCom_PCAN_VCU_0x13B.VCU_VehicleSts
+g_VehiMode_ReadyStsF：AppCom_PCAN_VCU_0x13B.VCU_FVehicleSts
+g_VehiMode_VCU_BCM_AuthnSts：AppCom_PCAN_VCU_0x13B.VCU_BCM_Authentication_Sts
+
+g_AntiJerk_RMotDampgLmtFactor：AppCom_PCAN_VCU_0x13B.VCU_MCUMDampgLmtFactor
+g_AntiJerk_FMotDampgLmtFactor：AppCom_PCAN_VCU_0x13B.VCU_MCUSDampgLmtFactor
+g_AntiJerk_RMotDampMaxTq：AppCom_PCAN_VCU_0x13B.VCU_MCUMMaxPosDampgTrq
+g_AntiJerk_RMotDampMinTq：AppCom_PCAN_VCU_0x13B.VCU_MCUMMaxNegDampgTrq
+g_AntiJerk_FMotDampMaxTq：AppCom_PCAN_VCU_0x13B.VCU_MCUSMaxPosDampgTrq
+g_AntiJerk_FMotDampMinTq：AppCom_PCAN_VCU_0x13B.VCU_MCUSMaxNegDampgTrq
+
+g_Hv_VheiHvModeF：AppCom_PCAN_VCU_0x13B.VCU_VehicleHighVoltModeF
+g_Hv_BmsMainRelayCmd：AppCom_PCAN_VCU_0x13B.VCU_BMSMainRelayR_Cmd
+g_Hv_BmsEmergCmd：AppCom_PCAN_VCU_0x13B.VCU_BMSEmergencyCmd
+g_Hv_FMcuActiveReleaseCmd：AppCom_PCAN_VCU_0x13B.VCU_FMCUActiveReleaseCmd
+g_Hv_RMcuActiveReleaseCmd：AppCom_PCAN_VCU_0x13B.VCU_RMCUActiveReleaseCmd
+g_Hv_VheiHvModeR：AppCom_PCAN_VCU_0x13B.VCU_VehicleHighVoltMode
+
+g_Ped_BrakeSysFault：AppCom_CCAN_VCU_0xB6.VCU_BrakeSysFault_IDB6_CCAN
+g_Ped_AccPedFaultSts：AppCom_CCAN_VCU_0xB6.VCU_AccPedalValid_IDB6_CCAN
+g_Ped_AccPedPct：AppCom_CCAN_VCU_0xB6.VCU_ThrottlePosition_IDB6_CCAN
+
+g_Gear_GearLevelPosSts：AppCom_CCAN_VCU_0xB6.VCU_GearLevelPosSts_IDB6_CCAN
+
+g_Warn_VehiWarningLv：AppCom_CCAN_VCU_0xB7.VCU_Vehicle_Warning_IDB7_CCAN
+
+g_Chg_AcAlwChgSts：AppCom_PCAN_VCU_0x13B.VCU_AlwACChargeInventerSts
+g_Chg_DcAlwChgSts：AppCom_PCAN_VCU_0x13B.VCU_AlwDCChargeSts
+g_Chg_ChgPauseReq：AppCom_PCAN_VCU_0x13B.VCU_ChargePauseReq
+
+g_Lv_DcdcEnableCmd：AppCom_PCAN_VCU_0x13B.VCU_DCDCEnableCmd
+
+g_FuelDet_FuelTankLockReq：AppCom_PCAN_VCU_0x13B.VCU_FuelTankLockReq
+
+g_RETrq_GCUReqTrq：AppCom_PCAN_VCU_0xBB.VCU_GCURequestTorque
+g_RETrq_GCUReqSpd：AppCom_PCAN_VCU_0xBB.VCU_GCURequesSpeed
+g_RETrq_TarChgPwr：AppCom_PCAN_VCU_0xBB.VCU_MotChargePower
+g_RETrq_TrqReqValS：AppCom_PCAN_VCU_0xBB.VCU_STorqueReqValid
+g_RETrq_EMSTrqReqS：AppCom_PCAN_VCU_0xBB.VCU_STorqueReq
+g_RETrq_EMSTrqReqF：AppCom_PCAN_VCU_0xBB.VCU_FTorqueReq 
+g_RETrq_TrqReqValF：AppCom_PCAN_VCU_0xBB.VCU_FTorqueReqValid
+g_RETrq_VCU_ForceChgPwr：AppCom_PCAN_VCU_0xBB.VCU_ForceChgPwr
+
+g_FuelDet_FVVOpenReq：AppCom_PCAN_VCU_0xBB.VCU_FVVOpenReq
+
+g_EngReq_GCUCtrlMod：AppCom_PCAN_VCU_0xBB.VCU_GCUControlMode
+g_EngReq_GCUAassistFB：AppCom_PCAN_VCU_0xBB.VCU_GCUAassistFB
+g_EngReq_EngStrtReq：AppCom_PCAN_VCU_0xBB.VCU_EngineStartReq
+g_EngReq_EngFuelInhibitReq：AppCom_PCAN_VCU_0xBB.VCU_EngineFuelInhibitReq
+g_EngReq_EngOffReq：AppCom_PCAN_VCU_0xBB.VCU_EngineOffRequest
+g_EngReq_EngResetSts：AppCom_PCAN_VCU_0xBB.VCU_EngineResetSts
+g_EngReq_EngineSts：AppCom_PCAN_VCU_0xBB.VCU_EngineSts
+g_EngReq_EngFuleCutoffReq：AppCom_PCAN_VCU_0xBB.VCU_EngineFuleCutoffReq
+
+g_Hv_GcuActiveReleaseCmd：AppCom_PCAN_VCU_0xBB.VCU_GCUActiveReleaseCmd
+
+g_RELmt_REOverPwrFlg：AppCom_PCAN_VCU_0xBB.VCU_PowerOverSts
+g_RELmt_FastTrqActive_101：AppCom_PCAN_VCU_0xBB.VCU_PowerReducetSts
+g_RELmt_FastTrqActive：AppCom_PCAN_VCU_0xBB.VCU_FTorqueSwFb
+
+g_Ped_AccLThrPosition：AppCom_PCAN_VCU_0xBB.VCU_APS1Position 
+
+g_OBD_WarmUpCycIndica：AppCom_PCAN_VCU_0xBB.VCU_WarmUpCycleIndicator
+
+g_RESysSt_REReadySts：AppCom_PCAN_VCU_0xBB.VCU_REsystemSts
+g_RESysSt_RESysFaultSts：AppCom_PCAN_VCU_0xBB.VCU_REsystemFaultSts
+g_RESysSt_REsystemSts_102：AppCom_PCAN_VCU_0xBB.VCU_EngineRunAllowFlg
+
+g_Ped_AccHThrPosition：AppCom_PCAN_VCU_0xBB.VCU_APS2Position
+
+g_EngSpc_EngineIdleReq：AppCom_PCAN_VCU_0xBB.VCU_EngineIdleReq
+g_EngSpc_EngineIdleSpeed：AppCom_PCAN_VCU_0xBB.VCU_EngineIdleSpeed
+
+g_Spd_VehiSpd：AppCom_PCAN_VCU_0xBC.VCU_VehicleSpdDirect
+
+g_FuncCfg_DeliveryModeSts：AppCom_PCAN_VCU_0xBC.VCU_DeliveryModeSts
+
+g_Chg_ChrgDischrgFunSts：AppCom_PCAN_VCU_0xBC.VCU_ChrgDischrgFunSts
+
+g_Hv_HighVoltSysSts：AppCom_PCAN_VCU_0xBC.VCU_HighVoltSysSts
+
+g_Gear_ShiftFailureReason：AppCom_PCAN_VCU_0xBC.VCU_GearLvrChangeSts
+g_Gear_GearLevelPosFault：AppCom_PCAN_VCU_0xBC.VCU_GearLevelPosFault
+g_Gear_AdasForbid：AppCom_PCAN_VCU_0xBC.VCU_DriverAssistProhibitSts
+
+g_OnePed_SysFaultSts：AppCom_PCAN_VCU_0xBC.VCU_SinglePedalSts
+
+g_Warn_SystemError：AppCom_PCAN_VCU_0xBC.VCU_SystemError
+g_Warn_LvSystemError：AppCom_PCAN_VCU_0xBC.VCU_LVSystemError
+g_Warn_HvSystemError： AppCom_PCAN_VCU_0xBC.VCU_HVSystemError
+
+g_Ped_AccPedFaultLv：AppCom_PCAN_VCU_0xBC.VCU_AccPedalFaultLV
+g_Ped_BrkPedSts：AppCom_PCAN_VCU_0xBC.VCU_BrakeSwitchSts
+
+g_OnePed_OnePedalSts：AppCom_PCAN_VCU_0xBC.VCU_LPedalModeSts
+
+g_TrqArb_WheelTrqType：AppCom_PCAN_VCU_0xBC.VCU_WheelTrqType
+
+g_VehiMode_VehiMode：AppCom_PCAN_VCU_0xBC.VCU_OpeartingMode
+
+g_RESysSt_REModeReq：AppCom_PCAN_VCU_0xBC.VCU_EnergyMode
+
+g_Hvil_DrvHvilStsF：AppCom_PCAN_VCU_0xBC.VCU_DriveFHVILSts
+g_Hvil_DrvHvilStsR：AppCom_PCAN_VCU_0xBC.VCU_DriveRHVILSts
+g_Hvil_DcChgHvilSts：AppCom_PCAN_VCU_0xBC.VCU_DCChgHVILSts
+g_Hvil_AcChgHvilSts：AppCom_PCAN_VCU_0xBC.VCU_ACChgHVILSts
+g_Hvil_CcmHvilSts：AppCom_PCAN_VCU_0xBC.VCU_CCMHVILSts
+g_Hvil_HvilFaultSts：AppCom_PCAN_VCU_0xBC.VCU_HVILSysSts
+
+g_Stability_DiffProtRActFlg：AppCom_PCAN_VCU_0xBC.VCU_MCUMDiffProtectSts
+g_Stability_DiffProtFActFlg：AppCom_PCAN_VCU_0xBC.VCU_MCUSDiffProtectSts
+g_Stability_VehicleNegTrqRspdSts：AppCom_PCAN_VCU_0xBC.VCU_VehicleNegTrqRspdSts
+
+g_SpdLmt_VehSpdLimtProp：AppCom_PCAN_VCU_0x514.VCU_VehSpdLimtRemind_ID514
+g_SpdLmt_VCU_SpdLimModeSts：AppCom_PCAN_VCU_0xBC.VCU_SpdLimModeSts
+
+g_ParaEsti_SlopeEst_Can：AppCom_PCAN_VCU_0xBC.VCU_SlopeEst
+g_ParaEsti_SlopeEstVd：AppCom_PCAN_VCU_0xBC.VCU_SlopeEst_Valid
+
+g_OBD_MilLampReq：AppCom_PCAN_VCU_0x514.VCU_MilLamp
+g_OBD_VCU_ReqMilLamp：AppCom_PCAN_VCU_0x514.VCU_MilLampRequest_ID514
+
+g_EngReq_EngStrtFail：AppCom_PCAN_VCU_0x514.VCU_EngineStartFailure_ID514
+
+g_RESysSt_RESysFaultSts_514：AppCom_PCAN_VCU_0x514.VCU_REsystemFaultSts_ID514
+g_RESysSt_REsystemSts_514：AppCom_PCAN_VCU_0x514.VCU_EngineRunAllowFlg_ID514
+g_RESysSt_REReadySts_514：AppCom_PCAN_VCU_0x514.VCU_REsystemSts_ID514
+
+g_Chg_InverterTip：AppCom_PCAN_VCU_0x514.VCU_InverterTip 
+g_REMode_RepairFB：AppCom_PCAN_VCU_0x514.VCU_EMSRepairModeSts
+g_FuncCfg_ShowCarModeSts：AppCom_PCAN_VCU_0x514.VCU_ShowCarModeSts
+g_OnePed_SysFaultSts：AppCom_PCAN_VCU_0x514.VCU_SinglePedalSts_ID514
+
+g_FuelDet_ParkReminder：AppCom_PCAN_VCU_0x514.VCU_ParkBeforeFuelup
+g_FuelDet_FuelTankFlapSts：AppCom_PCAN_VCU_0x514.VCU_FuelTankFlapSts
+
+g_AIn_AccPedHPwr：lcl_AIn_AccPedHPwr
+
+g_Hv_HvOffSts：AppCom_PCAN_VCU_0xDE.VCU_Hv_HvOffSts
+g_Hv_SelfChkSts：AppCom_PCAN_VCU_0xDE.VCU_Hv_SelfChkSts
+g_Crash_VehiCrashSts：AppCom_PCAN_VCU_0xDE.VCU_Crash_VehiCrashSts
+g_Lv_SleepSatisfiedSts：AppCom_PCAN_VCU_0xDE.VCU_Lv_SleepSatisfiedSts
+g_FuelDet_EngFuelStopReq：AppCom_PCAN_VCU_0xDE.VCU_FuelDetctionModule
+
+g_AntiJerk_RmotFilterTrqRange：AppCom_PCAN_VCU_0xDE.VCU_MDrvFilterTrqRange 
+
+g_BSW_VertifySts：AppCom_PCAN_VCU_0x359.BSW_VertifySts
+
+g_FuncCfg_DeliveryModeSts：AppCom_CCAN_VCU_0xB6.VCU_DeliveryModeSts_IDB6_CCAN
+
+g_ApsFunc_ApsAllowType：AppCom_CCAN_VCU_0xB7.VCU_Available_APS
+g_ApsFunc_ApsActiveSts：AppCom_CCAN_VCU_0xB7.VCU_Active_APS
+
+g_CcsFunc_CcsActiveSts：AppCom_CCAN_VCU_0xB7.VCU_CCSStatus
+g_CcsFunc_CcsAllowType：AppCom_CCAN_VCU_0xB7.VCU_CCSAllow
+
+g_Warn_PwrReduceLv：AppCom_CCAN_VCU_0xB7.VCU_PowerReduceReq
+g_Warn_VehiWarningLv：AppCom_CCAN_VCU_0xB7.VCU_Vehicle_Warning_IDB7_CCAN
+
+AppCom_LIN_EOP.LIN_PUMPEnable：AppCom_LIN_EOP_IOC.LIN_PUMPEnable
+AppCom_LIN_EOP.LIN_PUMPSpeedReq：AppCom_LIN_EOP_IOC.LIN_PUMPSpeedReq
+AppCom_LIN_EOP.LIN_PUMPFaultClear：AppCom_LIN_EOP_IOC.LIN_PUMPFaultClear
+
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Id_Ref           = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Id_Ref;         
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Iq_Ref           = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Iq_Ref;         
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Id_Fb            = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Id_Fb;          
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Iq_Fb            = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Iq_Fb;          
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Vd_Ref           = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Vd_Ref;         
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Vq_Ref           = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Vq_Ref;         
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Id_LookUp        = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Id_LookUp;      
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Iq_LookUp        = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Iq_LookUp;      
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Us_Out           = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Us_Out;         
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Torque_PwrEst    = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Torque_PwrEst;  
+	AppCom_PCAN_MCUM_0x5D0.RMCU_UserDefine_20ms  = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_UserDefine_20ms;
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Torque_Ref       = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Torque_Ref;     
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Torque_ExtChar   = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Torque_ExtChar; 
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Damp_CompTorque  = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Damp_CompTorque;
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Damp_CompCoeff   = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Damp_CompCoeff; 
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Damp_State       = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Damp_State;     
+	AppCom_PCAN_MCUM_0x5D0.RMCU_PWM_State        = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_PWM_State;      
+	AppCom_PCAN_MCUM_0x5D0.RMCU_JuncTemp_Max     = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_JuncTemp_Max;   
+	AppCom_PCAN_MCUM_0x5D0.RMCU_JuncLoss_Max     = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_JuncLoss_Max;   
+	AppCom_PCAN_MCUM_0x5D0.RMCU_CurrTheta_Comp   = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_CurrTheta_Comp; 
+	AppCom_PCAN_MCUM_0x5D0.RMCU_CurrAmp_Comp     = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_CurrAmp_Comp;   
+	AppCom_PCAN_MCUM_0x5D0.RMCU_LUT_Spd          = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_LUT_Spd;        
+	AppCom_PCAN_MCUM_0x5D0.RMCU_Spd_Delta        = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_Spd_Delta;
+	AppCom_PCAN_MCUM_0x5D0.RMCU_RawSinCorr       = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_RawSinCorr;
+	AppCom_PCAN_MCUM_0x5D0.RMCU_RawCosCorr       = AppCom_PCAN_MCUM_0x5D0_IOC.RMCU_RawCosCorr;
+
+	AppCom_PCAN_MCUM_0x5D3.RMCU_StatorTemp_1            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_StatorTemp_1;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_StatorTemp_2            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_StatorTemp_2;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_IGBTTemp_U              = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_IGBTTemp_U;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_IGBTTemp_V              = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_IGBTTemp_V;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_IGBTTemp_W              = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_IGBTTemp_W;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_PCBTemp                 = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_PCBTemp;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Power_12V               = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Power_12V;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Power_15V               = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Power_15V;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Offset_IU               = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Offset_IU;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Offset_IV               = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Offset_IV;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Offset_IW               = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Offset_IW;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MainSt_State            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MainSt_State;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Derate_Reason           = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Derate_Reason;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_PWM_Freq_kHz            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_PWM_Freq_kHz;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_PWMEn_State             = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_PWMEn_State;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_DrvPwrEn_Out_State      = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_DrvPwrEn_Out_State;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Rotor_Position          = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Rotor_Position;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_PosTransduserFaultCode  = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_PosTransduserFaultCode;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_ASC_EntryCount          = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_ASC_EntryCount;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Spd_Turn                = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Spd_Turn;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_LUT_Spd_Max             = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_LUT_Spd_Max;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWFault_RstCnt          = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWFault_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWFoB_RstCnt            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWFoB_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWFoT_RstCnt            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWFoT_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWDrvUV_RstCnt          = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWDrvUV_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWRdc_RstCnt            = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWRdc_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWOC_RstCnt             = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWOC_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWOV_RstCnt             = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWOV_RstCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_12V_Max                 = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_12V_Max;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_12V_Min                 = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_12V_Min;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWDrvUV_RstIdleCnt      = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWDrvUV_RstIdleCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_HWDrvUV_OccurMaxCnt     = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_HWDrvUV_OccurMaxCnt;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_CpldRest_TimeOut_flag   = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_CpldRest_TimeOut_flag;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_DrvPCBCurr              = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_DrvPCBCurr;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_EOL_StateMachine        = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_EOL_StateMachine;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_CpldRest_ASC_Flag       = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_CpldRest_ASC_Flag;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_LimSpdTorFlag           = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_LimSpdTorFlag;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_PWM_Err_Count           = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_PWM_Err_Count;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_RDC_Reset_Count         = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_RDC_Reset_Count;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_ASC_Stop_Flag           = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_ASC_Stop_Flag;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_ASC_Soft_Exiting_Flag   = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_ASC_Soft_Exiting_Flag;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_Vbus_ServeLowChkEn      = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_Vbus_ServeLowChkEn;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_EOP_BlockErr_IsLim_Flag = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_EOP_BlockErr_IsLim_Flag;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_IdqErrCount             = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_IdqErrCount;
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotSelfHeat_EnSts       = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotSelfHeat_EnSts;              
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotBlockHeat_LvlFb      = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotBlockHeat_LvlFb;         
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotRotaryHeat_LvlFb     = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotRotaryHeat_LvlFb;         
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotSelfHeat_DropLvlFb   = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotSelfHeat_DropLvlFb;            
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotSelfHeat_DropLvlRsn  = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotSelfHeat_DropLvlRsn;            
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotBlockHeat_CurAngle   = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotBlockHeat_CurAngle;           
+	AppCom_PCAN_MCUM_0x5D3.RMCU_MotBlockHeat_CurMag     = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_MotBlockHeat_CurMag;         
+	AppCom_PCAN_MCUM_0x5D3.RMCU_UserDefine_Byte1        = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_UserDefine_Byte1;      
+	AppCom_PCAN_MCUM_0x5D3.RMCU_UserDefine_Word1        = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_UserDefine_Word1;      
+	AppCom_PCAN_MCUM_0x5D3.RMCU_UserDefine_Word2        = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_UserDefine_Word2;      
+	AppCom_PCAN_MCUM_0x5D3.RMCU_UserDefine_Word3        = AppCom_PCAN_MCUM_0x5D3_IOC.RMCU_UserDefine_Word3;
+
+AppCom_PCAN_MCUM_0xCA.RMCU_ActualTorqueFB：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_ActualTorqueFB
+AppCom_PCAN_MCUM_0xCA.RMCU_DrvMotorWorkSts：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_DrvMotorWorkSts
+AppCom_PCAN_MCUM_0xCA.RMCU_HWRdcFault：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_HWRdcFault
+AppCom_PCAN_MCUM_0xCA.RMCU_DrvMotorRPMVD：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_DrvMotorRPMVD
+AppCom_PCAN_MCUM_0xCA.RMCU_DrvMotorRPM： AppCom_PCAN_MCUM_0xCA_IOC.RMCU_DrvMotorRPM
+AppCom_PCAN_MCUM_0xCA.RMCU_DragSts ：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_DragSts
+AppCom_PCAN_MCUM_0xCA.RMCU_MaxTorqueAllow：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_MaxTorqueAllow
+AppCom_PCAN_MCUM_0xCA.RMCU_MinTorqueAllow：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_MinTorqueAllow
+AppCom_PCAN_MCUM_0xCA.RMCU_MaxSpeedAllow：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_MaxSpeedAllow
+AppCom_PCAN_MCUM_0xCA.RMCU_MainWireVolt：AppCom_PCAN_MCUM_0xCA_IOC.RMCU_MainWireVolt
+
+AppCom_PCAN_VCU_0x13B.VCU_VehicleSts：g_VehiMode_ReadySts
+AppCom_PCAN_VCU_0x13B.VCU_RDrvControlMode：g_TrqArb_RMotCtlTypeVD
+AppCom_PCAN_VCU_0x13B.VCU_RDrvRequesSpeed：g_TrqArb_RMotRpmReq
+AppCom_PCAN_VCU_0x13B.VCU_RDrvRequestTorqueVD：g_RpmAdj_RMotTrqReqVD
+AppCom_PCAN_VCU_0x13B.VCU_RDrvRequestTorque：g_RpmAdj_RMotTrqReq
+AppCom_PCAN_VCU_0x13B.VCU_BrakePedalValue：g_Ped_BrkPedPctFilt
+AppCom_PCAN_VCU_0x13B.VCU_RMCUMaxDischargePower：g_Pwr_MotMaxDrvPwr_Can
+AppCom_PCAN_VCU_0x13B.VCU_RMCUMaxChargePower：g_Pwr_MotMaxRecPwr_Can
+AppCom_PCAN_VCU_0x13B.VCU_VehicleDirect：g_RpmAdj_VehiDirect_Can
+AppCom_PCAN_VCU_0x13B.VCU_SuppressJitterRMCURequest：g_SigAggr_MotAntiJerkOffReq
+AppCom_PCAN_VCU_0x13B.VCU_MCUMDampgLmtFactor：g_AntiJerk_RMotDampgLmtFactor
+AppCom_PCAN_VCU_0x13B.VCU_MCUMMaxPosDampgTrq：g_AntiJerk_RMotDampMaxTq
+AppCom_PCAN_VCU_0x13B.VCU_MCUMMaxNegDampgTrq：g_AntiJerk_RMotDampMinTq
+AppCom_PCAN_VCU_0x13B.VCU_GearLevelPosSts：g_Gear_GearLevelPosSts
+AppCom_PCAN_VCU_0x13B.VCU_AccPedalValid：g_Ped_AccPedFaultSts
+AppCom_PCAN_VCU_0x13B.VCU_ThrottlePosition：g_Ped_AccPedPct
+AppCom_PCAN_VCU_0x13B.VCU_RMCUActiveReleaseCmd：g_Hv_RMcuActiveReleaseCmd
