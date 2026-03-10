@@ -1,0 +1,86 @@
+#define APPCOM_SWC_STOP_SEC_CODE
+#include "APPCOM_SWC_MemMap.h"
+#define APPCOM_SWC_START_SEC_CODE
+#include "APPCOM_SWC_MemMap.h"
+FUNC (void, APPCOM_SWC_CODE) APPCOM_Tx_5ms_Fuc/* return value & FctID */
+(
+        void
+)
+{
+
+    /* Local Data Declaration */
+
+    /*PROTECTED REGION ID(UserVariables :APPCOM_Tx_5ms_Fuc) ENABLED START */
+    /* Start of user variable defintions - Do not remove this comment  */
+    /* End of user variable defintions - Do not remove this comment  */
+    /*PROTECTED REGION END */
+    Std_ReturnType retValue = RTE_E_OK;
+    /*  -------------------------------------- Data Read -----------------------------------------  */
+
+    /*  -------------------------------------- Server Call Point  --------------------------------  */
+
+    /*  -------------------------------------- CDATA ---------------------------------------------  */
+
+    /*  -------------------------------------- Data Write ----------------------------------------  */
+
+    /*  -------------------------------------- Trigger Interface ---------------------------------  */
+
+    /*  -------------------------------------- Mode Management -----------------------------------  */
+
+    /*  -------------------------------------- Port Handling -------------------------------------  */
+
+    /*  -------------------------------------- Exclusive Area ------------------------------------  */
+
+    /*  -------------------------------------- Multiple Instantiation ----------------------------  */
+
+    /*PROTECTED REGION ID(User Logic :APPCOM_Tx_5ms_Fuc) ENABLED START */
+    /* Start of user code - Do not remove this comment */
+
+
+    /* End of user code - Do not remove this comment */
+    /*PROTECTED REGION END */
+
+}
+
+#define APPCOM_SWC_STOP_SEC_CODE
+#include "APPCOM_SWC_MemMap.h"
+#define APPCOM_SWC_START_SEC_CODE
+#include "APPCOM_SWC_MemMap.h"
+FUNC (void, APPCOM_SWC_CODE) APPCOM_Rx_5ms_Fuc/* return value & FctID */
+(
+        void
+)
+{
+
+    /* Local Data Declaration */
+
+    /*PROTECTED REGION ID(UserVariables :APPCOM_Rx_5ms_Fuc) ENABLED START */
+    /* Start of user variable defintions - Do not remove this comment  */
+    /* End of user variable defintions - Do not remove this comment  */
+    /*PROTECTED REGION END */
+    Std_ReturnType retValue = RTE_E_OK;
+    /*  -------------------------------------- Data Read -----------------------------------------  */
+
+    /*  -------------------------------------- Server Call Point  --------------------------------  */
+
+    /*  -------------------------------------- CDATA ---------------------------------------------  */
+
+    /*  -------------------------------------- Data Write ----------------------------------------  */
+
+    /*  -------------------------------------- Trigger Interface ---------------------------------  */
+
+    /*  -------------------------------------- Mode Management -----------------------------------  */
+
+    /*  -------------------------------------- Port Handling -------------------------------------  */
+
+    /*  -------------------------------------- Exclusive Area ------------------------------------  */
+
+    /*  -------------------------------------- Multiple Instantiation ----------------------------  */
+
+    /*PROTECTED REGION ID(User Logic :APPCOM_Rx_5ms_Fuc) ENABLED START */
+    /* Start of user code - Do not remove this comment */
+
+    /* End of user code - Do not remove this comment */
+    /*PROTECTED REGION END */
+
+}

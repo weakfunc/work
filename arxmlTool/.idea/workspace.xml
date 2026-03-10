@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2f5b0f93-4198-4380-835c-6f3f00acb5d5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/Analysis-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/Analysis-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/EXE-00.toc" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/EXE-00.toc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/base_library.zip" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/base_library.zip" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/main.pkg" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/main.pkg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/warn-main.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/warn-main.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/main/xref-main.html" beforeDir="false" afterPath="$PROJECT_DIR$/build/main/xref-main.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/APPCOM_SWC.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/input/APPCOM_SWC.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/DBC_SysDesc.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/input/DBC_SysDesc.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/EEA3.5X_LP_CAN通讯协议_P_CANFD_VCU_20251210.dbc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/MCU_SYSTEM.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/input/MCU_SYSTEM.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/Project_EcucValues.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/input/Project_EcucValues.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/input/signalInfoInput.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/input/signalInfoInput.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Changed/APPCOM_SWC.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Changed/APPCOM_SWC.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Changed/DBC_SysDesc.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Changed/DBC_SysDesc.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Changed/MCU_SYSTEM.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Changed/MCU_SYSTEM.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Changed/Project_EcucValues.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Changed/Project_EcucValues.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Original/APPCOM_SWC.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Original/APPCOM_SWC.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Original/DBC_SysDesc.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Original/DBC_SysDesc.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Original/MCU_SYSTEM.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Original/MCU_SYSTEM.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/ArxmlFile_Original/Project_EcucValues.arxml" beforeDir="false" afterPath="$PROJECT_DIR$/output/ArxmlFile_Original/Project_EcucValues.arxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/log.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/output/log.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output/zenTao.txt" beforeDir="false" afterPath="$PROJECT_DIR$/output/zenTao.txt" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="33AlR5O9N9i7g0mRFHitaAQwGVn" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/pytool/uuid&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;tasks&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="arxmlTool" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-d68999036c7f-d3b881c8e49f-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-233.14475.56" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2f5b0f93-4198-4380-835c-6f3f00acb5d5" name="Changes" comment="" />
+      <created>1758767746372</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758767746372</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>1463</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>1766</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>1794</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>1773</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="tempWindow" />
+        <watch expression="tag" />
+        <watch expression="tempWindow" />
+        <watch expression="refWindow" />
+        <watch expression="refWindow" />
+        <watch expression="refWindow[6]" />
+        <watch expression="refWindow[7]" />
+        <watch expression="filePath" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>
