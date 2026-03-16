@@ -1,0 +1,937 @@
+# LeapEdrive_BswLib_TC377_D13 工程说明手册
+
+> **项目名称**：LeapEdrive_TC_D13
+> **所属公司**：零跑汽车（LeapMotor）
+> **文档日期**：2026-03-16
+> **目标读者**：嵌入式软件工程师、功能安全工程师、电机控制工程师
+
+---
+
+## 目录
+
+1. [工程概述](#1-工程概述)
+2. [硬件平台](#2-硬件平台)
+3. [软件架构](#3-软件架构)
+4. [目录结构详解](#4-目录结构详解)
+5. [多核启动流程](#5-多核启动流程)
+6. [功能安全体系（KRSTS）](#6-功能安全体系krsts)
+7. [应用层模块（ASW）](#7-应用层模块asw)
+8. [复杂设备驱动（CDD）](#8-复杂设备驱动cdd)
+9. [基础软件应用层（BswAPP）](#9-基础软件应用层bswapp)
+10. [链接脚本与内存布局（BootCtrl）](#10-链接脚本与内存布局bootctrl)
+11. [核间通信（IOC）](#11-核间通信ioc)
+12. [关键外设驱动说明](#12-关键外设驱动说明)
+13. [数据存储与NVM管理](#13-数据存储与nvm管理)
+14. [开发环境与编译](#14-开发环境与编译)
+15. [常用接口与调用规范](#15-常用接口与调用规范)
+16. [术语表](#16-术语表)
+
+---
+
+## 1. 工程概述
+
+本工程是一款面向**纯电动/增程式电动汽车主驱电机控制器（EDU - Electric Drive Unit）** 的嵌入式软件工程，基于 **AUTOSAR 架构**开发，目标处理器为英飞凌 **TC377（TriCore 架构）** 三核 MCU。
+
+### 核心功能
+
+| 功能域 | 描述 |
+|--------|------|
+| 整车控制（VCU） | 驱动力矩仲裁、模式管理、高低压管理、充电管理、增程器控制 |
+| 电机控制（FOC） | 磁场定向控制、电流环、弱磁控制、位置观测、PWM调制 |
+| 功能安全（FuSa） | ASIL-D级安全监控、SMU告警处理、硬件关断路径测试 |
+| 诊断（Diag） | UDS诊断服务（22/31等）、OBD、防盗（IMMO）、JTAG锁定 |
+| 通信（Com） | CAN/LIN通信管理、E2E保护、网络管理 |
+| 故障管理（Flt） | DTC故障码管理、MIL灯控制、故障使能条件 |
+| 数据存储 | NVM/FEE数据持久化（标定数据、故障记录、里程等） |
+
+---
+
+## 2. 硬件平台
+
+### 2.1 主控MCU：英飞凌 TC377
+
+| 参数 | 值 |
+|------|----|
+| 系列 | AURIX™ TC3xx |
+| 型号 | TC377 |
+| 架构 | TriCore 1.8（32位 RISC） |
+| CPU核心数 | 3核（Core0、Core1、Core2） |
+| 主频 | 最高 300 MHz |
+| Flash | 16 MB（程序+数据）|
+| SRAM | 6 MB |
+| 功能安全等级 | ISO 26262 ASIL-D |
+
+### 2.2 外部芯片
+
+| 芯片型号 | 类型 | 功能 |
+|----------|------|------|
+| TLF35584 | 系统基础芯片（SBC） | 电源管理（5V/3.3V/1.3V）+ 安全看门狗 + 故障针脚 |
+| GD3162 | 三相栅极驱动芯片 | 控制逆变器IGBT/SiC的开关，含SPI诊断 |
+| TJA1145AT | CAN收发器 | 支持部分网络/唤醒功能的 CAN FD收发器 |
+| DSADC | 外部差分Σ-Δ ADC | 高精度相电流采样 |
+| Resolver | 旋转变压器 | 电机轴绝对位置/速度检测 |
+
+### 2.3 三核分工
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    TC377 三核架构                               │
+├──────────────┬──────────────┬──────────────────────────────────┤
+│   Core0      │   Core1      │   Core2                          │
+│   QM         │ ASIL-A~D/QM  │   QM                            │
+│              │              │                                  │
+│ • VCU应用逻辑 │ • 功能安全监控 │ • FOC电流控制                   │
+│ • 整车模式管理 │ • SMU告警处理  │ • PWM生成                      │
+│ • CAN/LIN通信 │ • 电机安全监控 │ • 旋变解码                     │
+│ • OBD/UDS诊断 │ • 任务看门狗   │ • 弱磁控制                    │
+│ • 故障管理    │ • 关断路径测试 │ • 空间矢量调制                  │
+│ • 数据存储    │ • 安全FEE管理  │ • 电机参数估计                  │
+└──────────────┴──────────────┴──────────────────────────────────┘
+```
+
+---
+
+## 3. 软件架构
+
+本工程遵循 **AUTOSAR Classic Platform** 分层架构：
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                     应用软件层（ASW）                           │
+│  VCU_xxx | FOC_xxx | FUSI_xxx | AppCom | AppDiag | AppFlt     │
+├────────────────────────────────────────────────────────────────┤
+│                  运行时环境（RTE）                              │
+│              VCU_Rte.h / Rte_Fusi_SWC.h                       │
+├────────────────────────────────────────────────────────────────┤
+│             服务层（Services）/ BSW模块                         │
+│    OS | EcuM | BswM | Com | Dcm | Dem | Fee | Smu | Mcu ...   │
+├────────────────────────────────────────────────────────────────┤
+│             复杂设备驱动（CDD）                                  │
+│  CDD_GD3162 | CDD_TLF35584 | CDD_DSADC | CDD_GTM | MCS ...   │
+├────────────────────────────────────────────────────────────────┤
+│              MCAL（微控制器抽象层）                              │
+│      Adc | Spi | Gpt | Pwm | Dio | Port | Dma | Irq ...       │
+├────────────────────────────────────────────────────────────────┤
+│                  硬件（TC377）                                   │
+│        GTM | DSADC | QSPI | CAN | LIN | GPIO | MTTU ...       │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### 3.1 AUTOSAR关键概念
+
+- **SWC（Software Component）**：应用层软件组件，通过 RTE 接口相互通信
+- **RTE（Runtime Environment）**：软件组件间的虚拟总线，屏蔽底层细节
+- **IOC（Inter-OS-Application Communicator）**：跨 OS Application（即跨核）通信机制
+- **CDD（Complex Device Driver）**：不完全遵循 AUTOSAR 分层的特殊驱动（直接访问硬件）
+- **OS Application**：AUTOSAR OS 中的隔离单元，每个核有独立 OS Application
+- **EcuM**：ECU 状态管理模块，负责 ECU 启动/运行/关机的状态机
+
+---
+
+## 4. 目录结构详解
+
+```
+LeapEdrive_BswLib_TC377_D13/
+├── ASW/                          # 应用软件层（所有核的应用代码）
+│   ├── APPCOM_SWC/               # 通信管理软件组件
+│   ├── APPDIAG_SWC/              # 诊断服务软件组件
+│   ├── APPFLT_SWC/               # 故障管理软件组件
+│   ├── Base_SWC/                 # 基础软件组件（RTE接口）
+│   ├── Core0_QM/                 # Core0 VCU应用模型（Simulink生成）
+│   │   ├── Appl/                 # VCU业务功能函数
+│   │   ├── _data/                # 标定数据（CalData_1~7）
+│   │   ├── _dataverify/          # 标定数据CRC校验
+│   │   ├── _lib/                 # DSP数学库
+│   │   ├── _sharedutils/         # 共享工具函数
+│   │   └── RTE/                  # VCU的RTE接口层
+│   ├── Core1_ASIL_A/             # Core1 ASIL-A级应用
+│   ├── Core1_ASIL_B/             # Core1 ASIL-B级应用
+│   ├── Core1_ASIL_C/             # Core1 ASIL-C级应用（电机安全监控）
+│   │   ├── FUSI_SWC/             # 功能安全SWC（MoF*电机监控函数）
+│   │   ├── Monitor/              # 安全监控器
+│   │   ├── DATASTORE_SAFETY_SWC/ # 安全数据存储
+│   │   ├── FEE_SAFETY_SWC/       # 安全Flash存储接口
+│   │   ├── Task_Spinlock_FUSA/   # FuSa任务自旋锁
+│   │   └── TaskWatchdog/         # 任务看门狗
+│   ├── Core1_ASIL_D/             # Core1 ASIL-D级应用
+│   ├── Core1_QM/                 # Core1 QM级应用
+│   ├── Core2_QM/                 # Core2 FOC控制应用
+│   │   ├── FOC/                  # 磁场定向控制算法
+│   │   ├── AppModel/             # 应用模型
+│   │   ├── Public_Pub/           # 公共发布数据
+│   │   └── Task_Spinlock_ASW/    # ASW任务自旋锁
+│   ├── DATASTORE_SWC/            # 非易失性数据存储
+│   ├── dTCS/                     # 驱动扭矩控制系统
+│   │   ├── DMC/                  # 驱动电机控制器接口
+│   │   └── LDC/                  # 低压DC-DC控制
+│   ├── IOC_Core0/                # Core0核间通信接口
+│   ├── IOC_Core1/                # Core1核间通信接口
+│   ├── IOC_Core2/                # Core2核间通信接口
+│   ├── IOHwAb/                   # IO硬件抽象层（Core0）
+│   ├── IOHwAb_SWC_Core1/         # IO硬件抽象层（Core1）
+│   ├── IOHwAb_SWC_Core2/         # IO硬件抽象层（Core2）
+│   └── Asw_MemMap.h              # ASW内存映射宏定义
+│
+├── BswAPP/                       # 基础软件应用层（启动/OS/中断）
+│   ├── main.c                    # 主入口，含三核启动函数
+│   ├── InterruptHandler.c        # 中断服务例程（ISR）实现
+│   ├── InterruptCallback.c       # 中断回调函数
+│   ├── Os_Hooks.c                # AUTOSAR OS钩子函数
+│   ├── UserDefine.c              # 用户自定义初始化序列
+│   ├── Ifx_Ssw_Tc0/1/2.c        # 各核启动软件（SSW）
+│   ├── Ifx_Ssw_Infra.c           # SSW基础设施
+│   └── Ifx_Cfg_Ssw/Bmhd.c       # SSW配置与Boot模式头
+│
+├── BootCtrl/                     # 链接脚本与内存分区控制
+│   ├── Lcf_Gnuc_Tricore_Tc.lsl   # 主链接脚本
+│   ├── ASW_Core0_QM_*.lsl        # Core0 QM分区的代码/数据/BSS链接段
+│   ├── ASW_Core1_ASIL_*.lsl      # Core1各ASIL等级链接段
+│   ├── ASW_Core2_QM_*.lsl        # Core2 QM链接段
+│   └── genLinkfiles/             # 链接文件生成工具
+│
+├── CDD_QM/                       # 非安全复杂设备驱动
+│   ├── CDD_AscLin/               # LIN/UART驱动（AscLin外设）
+│   ├── CDD_CRC/                  # CRC硬件加速驱动
+│   ├── CDD_TJA1145AT/            # CAN收发器驱动（含部分网络）
+│   ├── MCS/                      # 电机控制软件（PWM/GTM生成）
+│   ├── Pwm_Resolver_Driver/      # PWM激励旋变驱动
+│   ├── CDD_QM_if.c/h             # QM CDD统一接口
+│   └── typedefs.h / rtwtypes.h   # 基础类型定义
+│
+└── CDD_Safety/                   # 安全复杂设备驱动
+    ├── CDD_DSADC/                # Δ-Σ ADC驱动（高精度电流采样）
+    ├── CDD_GD3162/               # 栅极驱动芯片驱动
+    │   ├── CDD_GD3162_B_App/     # Bottom相应用层
+    │   ├── CDD_GD3162_B_Driver/  # Bottom相驱动层
+    │   ├── CDD_GD3162_T_App/     # Top相应用层
+    │   ├── CDD_GD3162_T_Driver/  # Top相驱动层
+    │   ├── CDD_GD3162_IF/        # 对外统一接口
+    │   └── CDD_GD3162_Mapping/   # 信号映射
+    ├── CDD_GTM_Driver/           # GTM（通用定时器模块）安全驱动
+    ├── CDD_ShutoffPath/          # 硬件关断路径测试
+    ├── CDD_TLF35584/             # TLF35584 SBC安全驱动
+    │   ├── TLF35584_Driver/      # 驱动实现
+    │   └── TLF35584_IF/          # 接口定义
+    ├── KR_Spi_Driver/            # 安全SPI驱动（用于安全芯片通信）
+    ├── KRSTS/                    # KR安全测试套件（启动自检）
+    │   ├── cfg/                  # 配置文件
+    │   ├── inc/                  # 头文件
+    │   └── src/                  # 各测试模块源码
+    ├── Mpu/                      # 内存保护单元配置
+    └── CDD_Safety_if.c/h         # Safety CDD统一接口
+```
+
+---
+
+## 5. 多核启动流程
+
+### 5.1 总体启动流程
+
+```
+上电/复位
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     Core0 (main_tc0)                            │
+│  1. 获取复位原因（DataStore_Get_McuReset_Reason）               │
+│  2. DTS温度传感器限值初始化                                      │
+│  3. TLF35584 安全测试（KRSTS_TLF35584Test_Init_Start）          │
+│  4. FW固件完整性检测（KRSTSFwCheck_Test）                        │
+│  5. RAM内存自检（KRSTSMbist_Test - 测Core0自身RAM）              │
+│  6. MonBIST监控自检（KRSTSMonBist_Test）                         │
+│  7. 寄存器监控测试（KRSTSRegMon_Test）                           │
+│  8. SMU存活告警测试（KRSTSSmuAliveAlarm_Test）                   │
+│  9. SFR CRC校验（KRSTSSfrTst_TestCrc）                          │
+│  10. 温度传感器测试（KRSTSDtsResult_Test）                        │
+│  11. 启动Core1（KROS_start_core）                                │
+│  12. 等待Core1完成测试（glOSCore1BarrierInitPhase==1）           │
+└─────────────────────────────────────────────────────────────────┘
+         │                              │
+         │ 启动Core1                    │ 并行
+         ▼                              ▼
+┌──────────────────────┐    ┌──────────────────────────────────────┐
+│    Core1 (main_tc1)  │    │        Core2 (main_tc2)              │
+│ 1. 将Core0置IDLE态   │    │ 1. Core Local SPR初始化              │
+│ 2. 测试Core0 RAM     │    │ 2. AP检查测试（KRSBSTCore_APCheck）   │
+│    (KRSTSMbist_Test) │    │ 3. 内部总线测试                       │
+│ 3. 寄存器监控测试     │    └──────────────────────────────────────┘
+│ 4. 转换器测试         │
+│ 5. Core1 SBST测试    │
+│    (FlashCon/SRI/SBCU│
+│ 6. 恢复Core0运行态   │
+│ 7. 清SMU告警         │
+│ 8. 释放屏障信号       │
+└──────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    OS_MAIN（Core0）                              │
+│  1. 配置MPU数据/代码保护范围                                     │
+│  2. EcuM_Init()  → 进入AUTOSAR启动状态机                        │
+└─────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  EcuM 初始化序列                                  │
+│  UserDefine_Init1: IoHwAb_Adc_Init（ADC初始化）                  │
+│  UserDefine_Init2: Fee_Safety_Init/ReadAll → CDD_QM_Init        │
+│  UserDefine_Init3: CDD_Core1_Init（Core1安全驱动初始化）          │
+└─────────────────────────────────────────────────────────────────┘
+         │
+         ▼
+         进入周期性任务调度（OS 任务循环）
+```
+
+### 5.2 核间启动同步机制
+
+工程使用全局变量实现核间同步屏障：
+
+| 变量名 | 含义 |
+|--------|------|
+| `glOSCore0BarrierInitPhase` | Core0完成基础安全测试的信号（=1表示完成）|
+| `glOSCore1BarrierInitPhase` | Core1完成Core0 RAM测试及SBST的信号（=1表示完成）|
+| `glOSCore0BarrierRunPhase` | Core0允许Core1进入正常运行的信号 |
+
+这些变量通过 `#pragma section` 放置在特定的内存段，以确保多核可见性。
+
+---
+
+## 6. 功能安全体系（KRSTS）
+
+KRSTS（KR Safety Test Suite）是工程中负责启动阶段安全自检的核心框架，位于 `CDD_Safety/KRSTS/`。
+
+### 6.1 启动阶段安全测试项
+
+| 测试项 | 函数 | 测试对象 | 核 |
+|--------|------|----------|----|
+| LBIST | `KRSTSLbist_Test` | Logic Built-In Self Test（逻辑自检）| Core0 |
+| FW Check | `KRSTSFwCheck_Test` | Flash固件CRC完整性校验 | Core0 |
+| MBIST（Core0 RAM）| `KRSTSMbist_Test(0)` | Core0自身RAM | Core0 |
+| MonBIST | `KRSTSMonBist_Test` | 监控器自检 | Core0 |
+| RegMon | `KRSTSRegMon_Test(0)` | 关键寄存器值监控 | Core0 |
+| SMU Alive | `KRSTSSmuAliveAlarm_Test` | SMU告警通道存活性测试 | Core0 |
+| SFR CRC | `KRSTSSfrTst_TestCrc` | 特殊功能寄存器CRC校验 | Core0 |
+| DTS | `KRSTSDtsResult_Test` | 片内温度传感器功能校验 | Core0 |
+| TLF35584 Test | `KRSTS_TLF35584Test_Init_Start` | SBC芯片安全功能验证 | Core0 |
+| MBIST（Core0 RAM by Core1）| `KRSTSMbist_Test(1)` | 由Core1测试Core0 RAM | Core1 |
+| RegMon 1 | `KRSTSRegMon_Test(1)` | Core1的寄存器监控 | Core1 |
+| ConverterTest | `KRSTSConverter_Test` | 转换器测试 | Core1 |
+| SBST FlashCon | `KRSBSTFlashcon_Core_Test` | Core1 Flash控制器SBST | Core1 |
+| SBST SRI | `KRSBSTCore_SRI_Test` | Core1 SRI总线SBST | Core1 |
+| SBST SBCU | `KRSBSTCore_SBCU_Test` | Core1 SBCU SBST | Core1 |
+| AP Check | `KRSBSTCore_APCheck_Test(2)` | Core2 地址保护检查 | Core2 |
+| Internal Bus | `KRSBSTCore_InternalBus_Test(2)` | Core2 内部总线测试 | Core2 |
+
+### 6.2 运行时安全机制
+
+**SMU（Safety Management Unit）告警系统**
+
+SMU 是 TC377 的核心安全模块，监控硬件安全。`InterruptHandler.c` 中的 `Trap7_ISR` 是 SMU 的 NMI（不可屏蔽中断）处理函数，负责：
+- 读取并清除各 SMU 告警组（AG0~AG11）的告警标志
+- 调用 `Fusa_increaseErrCnt` 增加对应错误计数
+- 最终触发安全响应（告警计数达到阈值时降级/关机）
+
+**MPU（Memory Protection Unit）**
+
+`OS_MAIN` 中配置 MPU，实现：
+- 代码段只读执行保护
+- 数据段读写保护
+- 不同 OS Application 之间的内存隔离
+
+**任务看门狗（TaskWatchdog）**
+
+位于 `Core1_ASIL_C/TaskWatchdog/`，监控各周期任务是否按时执行，超时触发安全响应。
+
+**功能安全故障处理（FUSI_SWC）**
+
+`Fusa_Fault_handling.c` 定义故障索引枚举（从 LBIST_ERR_INDEX 到 SMU 告警索引），实现故障确认、计数、安全降级的完整机制。
+
+### 6.3 关断路径测试
+
+`CDD_Safety/CDD_ShutoffPath/` 实现硬件关断路径的完整性测试，在 `CDD_Core1_Init` 中调用：
+
+```c
+ShutoffPath_Test_Finish = CDD_Shutoff_Path_Test_MainFunc();
+```
+
+验证从软件指令到 IGBT 关断的整个硬件链路是否有效。
+
+---
+
+## 7. 应用层模块（ASW）
+
+### 7.1 VCU应用层（Core0_QM/Appl）
+
+VCU（Vehicle Control Unit）功能由 Matlab/Simulink 生成，运行在 Core0。
+
+#### 核心功能模块
+
+| 文件 | 功能描述 |
+|------|----------|
+| `VCU_MaiFunc.c` | VCU主调度函数，协调各子功能 |
+| `VCU_VehiMode.c` | 整车模式管理（Standby/Drive/Charge等）|
+| `VCU_PwrManage.c` | 动力功率管理与限制 |
+| `VCU_HvManage.c` | 高压系统管理（高压上下电、预充电）|
+| `VCU_LvManage.c` | 低压系统管理（12V电池监控）|
+| `VCU_PedTrq.c` | 踏板扭矩需求解析（加速踏板→驾驶员需求扭矩）|
+| `VCU_TrqArb.c` | 驱动扭矩仲裁（多输入扭矩请求仲裁）|
+| `VCU_FinalTrqArb.c` | 最终扭矩仲裁（考虑安全限制的最终输出）|
+| `VCU_MotTrqSplit.c` | 电机扭矩分配（前后电机分配）|
+| `VCU_BrkTrqSplit.c` | 制动扭矩分配（再生制动+液压制动）|
+| `VCU_SpdLmt.c` | 车速限制功能 |
+| `VCU_StabilityResp.c` | 稳定性响应（ESC/ABS协调控制）|
+| `VCU_DynAntiJerk.c` | 动态防抖控制（平顺性优化）|
+| `VCU_OnePedal.c` | 单踏板驾驶模式 |
+| `VCU_AccFunc.c` | ACC（自适应巡航控制）|
+| `VCU_CcsFunc.c` | 恒速巡航控制 |
+| `VCU_ApsFunc.c` | APS（自动泊车辅助）扭矩管理 |
+| `VCU_ChgManage.c` | 充电管理（AC/DC充电模式）|
+| `VCU_GearManage.c` | 档位管理（P/R/N/D）|
+| `VCU_AntiRollBack.c` | 防溜坡控制 |
+| `VCU_ParaEsti.c` | 参数估算（整车质量、坡度等在线估计）|
+| `VCU_PwrSig.c` | 电源信号处理（KL15/KL30等）|
+| `VCU_SigAggr.c` | 信号聚合（多传感器信号融合）|
+| `VCU_WarnSts.c` | 警告状态管理 |
+| `VCU_CrashSts.c` | 碰撞状态监测 |
+| `VCU_HvilSts.c` | 高压互锁（HVIL）状态监测 |
+
+#### 增程器相关模块
+
+| 文件 | 功能描述 |
+|------|----------|
+| `VCU_REModeCtrl.c` | 增程器模式控制 |
+| `VCU_RETrqManage.c` | 增程器扭矩管理 |
+| `VCU_REEngReqCtrl.c` | 发动机需求控制 |
+| `VCU_REPwrLmt.c` | 增程器功率限制 |
+| `VCU_REElecPwrCula.c` | 增程器电气功率计算 |
+| `VCU_RESysSts.c` | 增程器系统状态 |
+| `VCU_REClutchCtrl.c` | 离合器控制 |
+| `VCU_REFuelDetctionCtrl.c` | 燃油检测控制 |
+| `VCU_RESpecialStartReq.c` | 特殊启动请求处理 |
+| `VCU_REOBDDiagSts.c` | OBD诊断状态 |
+| `VCU_REPreSignal.c` | 增程器预处理信号 |
+
+### 7.2 FOC电机控制（Core2_QM/FOC）
+
+FOC（Field Oriented Control，磁场定向控制）运行在 Core2，实现高速电流控制闭环。
+
+#### 控制算法模块
+
+| 目录/文件 | 功能描述 |
+|-----------|----------|
+| `CoordinateTrans_if/` | Clarke变换（三相→两相）、Park变换（两相静止→旋转dq）|
+| `Current_Control_if/` | dq轴电流PI调节器（内环控制）|
+| `FluxWeaken_if/` | 弱磁控制（高速区扩速）|
+| `Volt_Modulate_if/` | 空间矢量调制（SVPWM）|
+| `DeadBandComp_if/` | 死区补偿（改善低速电流波形）|
+| `PositionObsr_if/` | 位置观测器（基于旋变或无传感器）|
+| `Spd_Calcu_if/` | 电机转速计算 |
+| `RDC_ReadOut_if/` | 旋变解码（RDC读取电气角度）|
+| `PWM_OutputSwitch_if/` | PWM输出控制（使能/禁止逆变器）|
+| `AdcInfo_if/` | ADC电流采样信息处理 |
+| `PhaseCurExtraction/` | 相电流提取（含温漂补偿）|
+| `IdcEstimation_if/` | 直流母线电流估算 |
+| `Math_Lib_if/` | 数学函数库（三角函数、滤波器等）|
+| `Harmonics_Controller/` | 谐波电流控制器（抑制6/12次谐波）|
+| `Resonant_Controller/` | 谐振控制器 |
+| `FFRLS/` | 前馈递推最小二乘（在线参数辨识）|
+| `HallDelayGain_Ident/` | Hall信号延迟增益辨识 |
+| `RslvOfstIdent/` | 旋变偏置角辨识（自标定）|
+| `MtrCalib_IdqSet_if/` | 电机标定dq轴电流设置 |
+| `JunctThmStall_if/` | 过温堵转保护 |
+| `System_Heating/` | 系统主动加热控制 |
+| `MoFIPh_IsOfsAmpCalc/` | 相电流偏置幅值计算 |
+| `SW_Pos_Decoding/` | 软件位置解码 |
+| `EddyCurPos/` | 涡流位置传感器处理 |
+
+### 7.3 电机安全监控（Core1_ASIL_C/FUSI_SWC）
+
+FUSI（Functional Safety）SWC 运行在 Core1 ASIL-C 级别，独立于主控制实现双通道监控。
+
+| 模块 | 功能 |
+|------|------|
+| `MoFMode/` | 电机功能安全模式管理（决定是否允许输出）|
+| `MoFIPh/` | 相电流独立监控（防过流）|
+| `MoFESpd/` | 电气转速独立监控（防超速）|
+| `MoFTrqAct/` | 实际扭矩独立计算与监控 |
+| `MoFTrqPtd/` | 扭矩设定值监控 |
+| `MoFEPos/` | 电气位置独立监控 |
+| `MoFUDC/` | 直流母线电压独立监控 |
+| `MoFUPh/` | 相电压监控 |
+| `MoFTrqCmp/` | 扭矩比较（主通道与安全通道）|
+| `MoFRx/` | 接收数据监控 |
+| `MoFTx/` | 发送数据监控 |
+| `MoFOpS/` | 操作状态监控 |
+| `MON/` | 通用安全监控框架 |
+| `Smu_Service.c` | SMU服务接口（向SMU报告安全状态）|
+| `Fusa_Fault_handling.c` | FuSa故障处理（错误计数、安全降级）|
+
+### 7.4 通信管理（APPCOM_SWC）
+
+| 文件 | 功能 |
+|------|------|
+| `AppCom_ComCallBack.c` | 报文接收回调函数 |
+| `AppCom_CommErrE2E.c` | E2E（端到端保护）错误处理 |
+| `AppCom_Common.c` | 通信公共功能（信号校验、超时管理）|
+| `AppCom_DataInterface_VCU.c` | VCU与通信层的数据接口 |
+| `AppCom_ErrorHandle.c` | 通信错误处理 |
+| `AppCom_EventMsg_Control.c` | 事件型报文控制（发送触发条件）|
+| `AppCom_NmHandling.c` | 网络管理（CAN NM，部分网络唤醒/休眠）|
+
+### 7.5 诊断服务（APPDIAG_SWC）
+
+| 文件 | 功能 |
+|------|------|
+| `AppDiag.c` | 诊断主模块 |
+| `AppDiag_Interface.c` | 诊断接口（Dcm回调）|
+| `AppDiag_IMMO.c` | 防盗（Immobilizer）功能 |
+| `AppDiag_IMMO_Aes128_Cmac.c` | IMMO的AES-128 CMAC加密认证 |
+| `AppDiag_Programming.c` | 编程模式（刷写跳转）|
+| `AppDiag_UDS_JtagLock.c` | JTAG调试口锁定 |
+| `AppDiag_UDS_Service0x22.c` | UDS 0x22服务（读数据标识符）|
+| `AppDiag_UDS_Service0x31.c` | UDS 0x31服务（例程控制）|
+| `AppDiag_OBD_PID.c` | OBD-II PID数据查询 |
+| `AppDiag_OBD_CvnCal.c` | OBD CVN（标定版本号）计算 |
+| `AppDiag_OBD_Service0x04.c` | OBD清除DTC服务 |
+| `AppDiag_OBD_Service0x09.c` | OBD请求车辆信息 |
+
+### 7.6 故障管理（APPFLT_SWC）
+
+| 文件 | 功能 |
+|------|------|
+| `APPFLT_SWC.c` | 故障SWC主入口 |
+| `APPFLT_ClearFlag.c` | DTC清除标志管理 |
+| `AppFlt_DtcStatus.c` | DTC状态字管理（active/pending/confirmed）|
+| `AppFlt_EnableCondition.c` | DTC使能条件（检测条件满足才监控）|
+| `AppFlt_MIL.c` | MIL（故障指示灯）控制 |
+
+---
+
+## 8. 复杂设备驱动（CDD）
+
+### 8.1 GD3162 栅极驱动（CDD_Safety/CDD_GD3162）
+
+GD3162 是 NXP 的三相 SiC/IGBT 栅极驱动芯片，通过 SPI 与 MCU 通信，实现诊断和保护。
+
+**初始化流程**（在 `CDD_Core1_Init` 中）：
+
+```c
+CDD_GD3162T_SPIInit();    // 初始化Top相的SPI通道
+CDD_GD3162B_SPIInit();    // 初始化Bottom相的SPI通道
+Spi_Init(&Spi_Config);    // AUTOSAR SPI初始化
+CDD_GD3162_Init();        // GD3162芯片完整初始化（含BIST自检）
+```
+
+**主要接口**：
+
+| 函数 | 功能 |
+|------|------|
+| `CDD_GD3162_Init()` | 芯片初始化（寄存器配置+BIST）|
+| `CDD_GD3162_MainFunc()` | 周期主函数（诊断读取+故障处理）|
+| `CDD_GD3162_BISTCheck()` | 内置自检 |
+| `CDD_GD3162_GetSelfCheckRes()` | 获取自检结果 |
+| `CDD_GD3162_PWM_State()` | 获取PWM输出状态 |
+| `GD3162_Aout_App()` | 模拟量输出应用 |
+
+**全局状态变量**：
+- `GD3162_PWM_State`：当前PWM输出状态（0=关断，1=正常）
+- `GD3162_SelfCheckState`：自检结果（E_OK=通过）
+- `GD3162_SelfCheckErr`：自检错误码
+
+### 8.2 TLF35584 系统基础芯片（CDD_Safety/CDD_TLF35584）
+
+TLF35584 提供电源管理和系统安全功能：
+- 为 MCU 提供调节好的电源轨（5V/3.3V/1.3V）
+- 内置看门狗（Windows WDG + Functional WDG）
+- 安全状态引脚（FSP，Fail Safe Pin）
+- MPS（监控引脚）：由代码控制，用于TLF安全测试时序
+
+启动阶段的 TLF35584 安全测试（`KRSTS_TLF35584Test_Init_Start`）验证 WDG 功能和安全状态转移的正确性。
+
+### 8.3 电机控制软件（CDD_QM/MCS）
+
+MCS（Motor Control Software）是 GTM/MCS（Micro Code Sequencer）驱动：
+
+| 文件 | 功能 |
+|------|------|
+| `MCS_App.c` | MCS应用层（协调PWM与ADC触发）|
+| `Gtm_Mcs.c` | GTM MCS硬件驱动 |
+| `mcs_gen/` | 自动生成的MCS代码 |
+
+GTM（Generic Timer Module）是 TC377 的专用定时器，用于高精度 PWM 波形生成，ATOM 通道通过 MCS 实现与 ADC 采样的精确同步。
+
+### 8.4 DSADC（CDD_Safety/CDD_DSADC）
+
+Delta-Sigma ADC 用于相电流的高精度采样（相比 SAR ADC 具有更高的精度和抗干扰性）：
+
+| 文件 | 功能 |
+|------|------|
+| `dsadc_if.c` | DSADC接口（初始化、读取、校准）|
+| `dsadc_if.h` | 接口声明 |
+
+在 `CDD_QM_Init` 中初始化：`Dsadc_Init(&Dsadc_Config)`
+
+### 8.5 AscLin LIN驱动（CDD_QM/CDD_AscLin）
+
+基于 AscLin（ASCLIN Asynchronous/Synchronous Interface）外设实现 LIN 总线通信，`LIN_Sys_Init()` 在 `CDD_QM_Init` 中调用完成初始化。
+
+### 8.6 旋变驱动（CDD_QM/Pwm_Resolver_Driver）
+
+通过 GTM ATOM 通道产生旋变激励信号（正弦波激励），配合 ADC 采样旋变返回信号，计算电机轴绝对角度。
+
+---
+
+## 9. 基础软件应用层（BswAPP）
+
+### 9.1 main.c 关键函数
+
+| 函数 | 描述 |
+|------|------|
+| `KR_main()` | 总入口，通过读 CORECON 寄存器（0xFE1C）分发到各核函数 |
+| `main_tc0()` | Core0 安全自检主函数 |
+| `main_tc1()` | Core1 安全自检主函数 |
+| `main_tc2()` | Core2 安全自检主函数 |
+| `OS_MAIN()` | AUTOSAR OS 主函数（配置MPU，调用EcuM_Init）|
+| `cstart()` | Core1/Core2 的 C 运行时启动钩子 |
+
+### 9.2 中断处理（InterruptHandler.c）
+
+| ISR | 触发源 | 功能 |
+|-----|--------|------|
+| `Os_Entry_AdcG0~G11_EndGroupConv` | ADC组转换完成 | 触发ADC数据读取 |
+| `GTM_ATOM_0_CH_7_ISR` | GTM ATOM0 CH7 | 旋变RDC同步触发 |
+| `GTM_ATOM_0_CH_0_ISR` | GTM ATOM0 CH0 | PWM周期中断（电流控制触发）|
+| `GTM_ATOM_0_CH_4_ISR` | GTM ATOM0 CH4 | PWM辅助通道 |
+| `GTM_ATOM_2_CH_7_ISR` | GTM ATOM2 CH7 | 旋变RDC备用触发 |
+| `AdcG8_EndGroupConv` | ADC G8转换完成 | 电流采样同步 |
+| `Trap1_ISR` | CPU陷阱1（MPU违规等）| 内存保护违规处理 |
+| `Trap7_ISR` | CPU陷阱7（NMI/SMU）| SMU安全告警处理 |
+
+### 9.3 用户初始化序列（UserDefine.c）
+
+```c
+// EcuM初始化阶段1：IO硬件抽象初始化
+void UserDefine_Init1() {
+    IoHwAb_Adc_Init();           // ADC通道初始化
+}
+
+// EcuM初始化阶段2：应用层初始化
+void UserDefine_Init2() {
+    Fee_Safety_Init();            // 安全Flash初始化
+    Fee_Safety_ReadAll();         // 读取所有NVM数据
+    CDD_QM_Init();                // QM CDD初始化（GTM/DSADC/LIN/TLF等）
+    DataStore_VcuSeamlessReset_Init(); // 无缝复位数据初始化
+}
+
+// EcuM初始化阶段3：Core1安全驱动初始化
+void UserDefine_Init3() {
+    CDD_Core1_Init();             // GD3162/SPI/DMA/关断路径测试
+}
+```
+
+### 9.4 OS Hooks（Os_Hooks.c）
+
+AUTOSAR OS 提供的系统钩子回调，用于：
+- 任务切换时的上下文保护
+- OS错误发生时的故障处理
+- 核间同步
+
+---
+
+## 10. 链接脚本与内存布局（BootCtrl）
+
+### 10.1 内存分区设计
+
+本工程采用 AUTOSAR OS Application 内存隔离机制，每个核的每个安全级别有独立的内存段：
+
+| 链接脚本（.lsl）| 对应内存区 |
+|-----------------|------------|
+| `ASW_Core0_QM_Code.lsl` | Core0 QM代码段 |
+| `ASW_Core0_QM_Data.lsl` | Core0 QM数据段（初始化数据）|
+| `ASW_Core0_QM_Bss.lsl` | Core0 QM BSS段（未初始化数据）|
+| `ASW_Core0_QM_Rodata.lsl` | Core0 QM只读数据段（常量/标定）|
+| `ASW_Core1_ASIL_A/B/C_*.lsl` | Core1各ASIL级内存段 |
+| `ASW_Core2_QM_*.lsl` | Core2 QM内存段 |
+
+### 10.2 特殊内存区
+
+在 `main.c` 中可见：
+
+```c
+// Core0的全局非初始化变量
+#pragma section ".bss.OS_APP_QM_Core0_Noinit_Global" aw
+uint32 volatile glOSCore0BarrierInitPhase;
+// ...
+
+// Core1的全局非初始化变量
+#pragma section ".bss.OS_APP_QM_Core1_Noinit_Global" aw
+uint32 volatile glOSCore1BarrierInitPhase;
+// ...
+```
+
+这些 `Noinit` 段在复位时**不会被清零**，用于跨复位传递关键数据（如 LBIST 数据备份）。
+
+### 10.3 代码段特殊标记
+
+```c
+#pragma section ".mcal_code" ax    // MCAL代码放入特定段
+```
+
+确保关键代码（如看门狗服务）放置在特定 Flash 区域，便于链接控制和 FW Check 的 CRC 计算。
+
+---
+
+## 11. 核间通信（IOC）
+
+### 11.1 IOC 机制
+
+TC377 多核之间的数据共享通过两种方式实现：
+
+1. **IOC（Inter-OS-Application Communicator）**：AUTOSAR 标准机制，通过共享内存+同步原语实现类型安全的数据交换
+   - `IOC_Core0/`：Core0发布/订阅的IOC通道
+   - `IOC_Core1/`：Core1的IOC通道
+   - `IOC_Core2/`：Core2的IOC通道
+
+2. **自旋锁（Spinlock）**：
+   - `Task_Spinlock_FUSA/`：FuSa通道的自旋锁（Core1安全数据写保护）
+   - `Task_Spinlock_ASW/`：ASW通道的自旋锁（Core2控制数据写保护）
+
+### 11.2 数据流方向
+
+```
+Core2 (FOC)          Core1 (Safety)         Core0 (VCU)
+───────────          ──────────────         ───────────
+实际电流Id/Iq   →   安全监控通道      ←→   扭矩设定值
+实际转速        →   FUSI监控          ←   驾驶员需求
+实际扭矩        →   比较判断          →   状态上报CAN
+PWM状态         →   告警处理          ←   使能/禁止指令
+```
+
+---
+
+## 12. 关键外设驱动说明
+
+### 12.1 GTM（Generic Timer Module）
+
+GTM 是 TC377 专有的高性能定时器，本工程的关键用途：
+
+| GTM模块 | 用途 |
+|---------|------|
+| ATOM0 CH0 | 三相 PWM 载波（主同步信号）|
+| ATOM0 CH4 | PWM 辅助通道 |
+| ATOM0 CH7 | 旋变 RDC 触发 |
+| ATOM2 CH7 | 备用旋变触发 |
+| MCS | 微代码序列器（实现复杂的PWM+ADC同步时序）|
+| TIM | 输入捕获（用于旋变信号采样）|
+
+### 12.2 ADC 采样策略
+
+| ADC组 | 用途 | 触发方式 |
+|-------|------|----------|
+| ADC G0 | 相电流采样（Ia）| GTM硬件触发（精确同步）|
+| ADC G1 | 相电流采样（Ib）| GTM硬件触发 |
+| ADC G2 | 温度/电压辅助采样 | 软件触发 |
+| ADC G8 | 电流高速采样（DSADC补充）| GTM触发 |
+| ADC G11 | 其他模拟量 | 软件触发 |
+
+### 12.3 SPI 通信
+
+| SPI通道 | 连接设备 | 用途 |
+|---------|----------|------|
+| QSPI（安全SPI）| TLF35584 | 安全测试时序控制 |
+| SPI（AUTOSAR）| GD3162 T/B | 栅极驱动诊断和配置 |
+| SPI | TJA1145AT | CAN收发器配置/唤醒 |
+
+---
+
+## 13. 数据存储与NVM管理
+
+### 13.1 DataStore 模块（ASW/DATASTORE_SWC）
+
+DataStore 提供应用层访问 NVM 的统一接口：
+
+| 文件 | 存储内容 |
+|------|----------|
+| `DataStore_AccPedFaultLv.c` | 加速踏板故障等级 |
+| `DataStore_AdcCurr.c` | ADC电流零点校准值 |
+| `DataStore_DeliveryMode.c` | 交车模式标志 |
+| `DataStore_EngRunTime.c` | 发动机运行时间 |
+| `DataStore_IgbtType.c` | IGBT类型配置 |
+| `DataStore_IMMO.c` | 防盗数据（密钥等）|
+| `DataStore_McuResetReason.c` | MCU复位原因记录 |
+| `DataStore_OBDCvn.c` | OBD CVN校验和 |
+| `DataStore_Rslv.c` | 旋变偏置角存储 |
+| `DataStore_ShowCarMode.c` | 展车模式 |
+| `DataStore_UDSResetFlag.c` | UDS复位标志 |
+| `DataStore_VcuDataHandle.c` | VCU综合数据管理 |
+| `DataStore_VcuImu.c` | IMU（惯性测量）数据 |
+| `DataStore_VcuSeamlessReset.c` | 无缝复位（快速重启）数据 |
+| `DataStore_VehicleConfig.c` | 整车配置参数 |
+| `DataStore_DataFlowRecord.c` | 数据流记录（调试用）|
+
+### 13.2 FEE（Flash EEPROM Emulation）
+
+工程分为两套 FEE：
+- **普通 FEE**：运行在 Core0，存储一般应用数据
+- **安全 FEE（Fee_Safety）**：运行在 Core1 ASIL 级别，存储功能安全相关数据（如转子偏置角）
+
+访问接口：
+```c
+Fee_Safety_Init();        // Core1初始化安全FEE
+Fee_Safety_ReadAll();     // 读出所有安全存储数据
+```
+
+---
+
+## 14. 开发环境与编译
+
+### 14.1 IDE
+
+- **工具链**：HighTec Eclipse IDE for TriCore（`com.rt.hightec`）
+- **工程类型**：CDT Managed Build（由 Eclipse CDT 管理的 Makefile 工程）
+- **工程名**：`LeapEdrive_TC_D13`（见 `.project` 文件）
+
+### 14.2 编译器
+
+- **编译器**：HighTec GNUC for TriCore（基于 GCC 的 TriCore 移植版）
+- **关键编译选项**（通过 `.cproject` 配置）：
+  - `-O2` 或 `-O3` 优化等级
+  - TriCore 特有指令集使能（`-march=tc162`）
+  - 功能安全相关的编译选项
+
+### 14.3 关键编译宏
+
+| 宏名 | 含义 |
+|------|------|
+| `KRSTS_REAL_SUPPORT` | 是否使能真实硬件安全测试（STD_ON/STD_OFF）|
+| `DATASTORE_VCUSEAMRESET_ENBALE` | 是否使能无缝复位功能 |
+| `MCAL_NO_OF_CORES` | 配置的核心数量（3）|
+
+### 14.4 构建流程
+
+1. 在 HighTec IDE 中打开工程（Import → Existing Project）
+2. 确认 TriCore 工具链路径配置正确
+3. 选择 Build Configuration（Debug / Release）
+4. Build → 生成 `.elf` / `.hex` 文件
+5. 使用 HighTec Debugger 或 Lauterbach TRACE32 下载调试
+
+---
+
+## 15. 常用接口与调用规范
+
+### 15.1 CDD 初始化顺序
+
+```
+上电复位
+└── EcuM_Init
+    ├── UserDefine_Init1
+    │   └── IoHwAb_Adc_Init()             [ADC基础初始化]
+    ├── UserDefine_Init2
+    │   ├── Fee_Safety_Init()             [安全FEE初始化]
+    │   ├── Fee_Safety_ReadAll()          [读取安全NVM]
+    │   └── CDD_QM_Init()
+    │       ├── gtm_init()                [GTM基础初始化]
+    │       ├── CDD_GTM_TIM_Init()        [GTM TIM输入捕获]
+    │       ├── Dsadc_Init()              [DSADC初始化]
+    │       ├── gtm_mcs_Init()            [MCS初始化]
+    │       ├── GtmAtom0Channel_Enable()  [使能PWM通道]
+    │       ├── GCDD_Tlf35584_Init()      [TLF35584初始化]
+    │       ├── LIN_Sys_Init()            [LIN初始化]
+    │       └── MPU_Init()               [MPU保护初始化]
+    └── UserDefine_Init3
+        └── CDD_Core1_Init()
+            ├── Aout_Tim_Icu_Init()       [模拟量定时器捕获]
+            ├── IrqDma_Init()            [DMA中断配置]
+            ├── IrqSpi_Init()            [SPI中断配置]
+            ├── Dma_Init()               [DMA初始化]
+            ├── CDD_GD3162T_SPIInit()    [GD3162 Top SPI]
+            ├── CDD_GD3162B_SPIInit()    [GD3162 Bot SPI]
+            ├── Spi_Init()               [AUTOSAR SPI]
+            ├── CDD_GD3162_Init()        [栅极驱动初始化]
+            └── CDD_Shutoff_Path_Test_MainFunc() [关断路径测试]
+```
+
+### 15.2 周期任务时序
+
+| 任务周期 | 典型内容 |
+|----------|----------|
+| 25 µs（高速中断）| FOC电流环（Core2）、PWM更新、DSADC采样 |
+| 100 µs | 速度计算、弱磁控制 |
+| 1 ms | VCU控制任务（Core0）、CAN接收处理 |
+| 10 ms | 故障检测、模式切换判断 |
+| 100 ms | CAN发送、OBD、NVM写入、网络管理 |
+| 1 s | 周期性自检（运行时安全监控）|
+
+### 15.3 安全监控告警响应流程
+
+```
+SMU 硬件检测到异常
+        ↓
+触发 Trap7（NMI中断）
+        ↓
+Trap7_ISR() → 读取 SMU 告警组状态
+        ↓
+Fusa_increaseErrCnt(xxx_ERR_INDEX) → 错误计数+1
+        ↓
+错误计数达到 FUSA_COMFIRM_CNT (3次)
+        ↓
+执行安全响应（如：关断PWM输出、系统降级、复位）
+```
+
+---
+
+## 16. 术语表
+
+| 术语 | 全称 / 解释 |
+|------|-------------|
+| AUTOSAR | Automotive Open System Architecture，汽车开放系统架构 |
+| ASIL | Automotive Safety Integrity Level，汽车安全完整性等级（A/B/C/D） |
+| QM | Quality Management，非安全等级 |
+| FuSa | Functional Safety，功能安全 |
+| SWC | Software Component，软件组件 |
+| RTE | Runtime Environment，运行时环境 |
+| IOC | Inter-OS-Application Communicator，跨核通信 |
+| CDD | Complex Device Driver，复杂设备驱动 |
+| MCAL | Microcontroller Abstraction Layer，微控制器抽象层 |
+| EcuM | ECU State Manager，ECU状态管理 |
+| BswM | BSW Mode Manager，基础软件模式管理 |
+| Com | Communication，通信模块 |
+| Dcm | Diagnostic Communication Manager，诊断通信管理 |
+| Dem | Diagnostic Event Manager，诊断事件管理 |
+| Fee | Flash EEPROM Emulation，Flash模拟EEPROM |
+| SMU | Safety Management Unit，安全管理单元（TC377硬件模块）|
+| GTM | Generic Timer Module，通用定时器模块（TC377专用）|
+| DSADC | Delta-Sigma Analog-to-Digital Converter，差分Σ-Δ ADC |
+| MCS | Micro Code Sequencer，GTM内的微代码序列器 |
+| ATOM | ARU-connected Timer Output Module，GTM的PWM输出模块 |
+| TIM | Timer Input Module，GTM的定时器输入模块 |
+| FOC | Field Oriented Control，磁场定向控制 |
+| SVPWM | Space Vector Pulse Width Modulation，空间矢量脉宽调制 |
+| RDC | Resolver-to-Digital Converter，旋变数字转换 |
+| SBST | Software-Based Self Test，基于软件的自检 |
+| LBIST | Logic Built-In Self Test，逻辑内建自检 |
+| MBIST | Memory Built-In Self Test，存储器内建自检 |
+| KRSTS | KR Safety Test Suite，安全测试套件（工程内命名） |
+| SBC | System Basis Chip，系统基础芯片 |
+| TLF35584 | 英飞凌 SBC 芯片（电源+看门狗+安全）|
+| GD3162 | NXP 三相栅极驱动芯片 |
+| TJA1145AT | NXP CAN FD收发器（含部分网络功能）|
+| MPU | Memory Protection Unit，内存保护单元 |
+| E2E | End-to-End protection，端到端数据保护 |
+| DTC | Diagnostic Trouble Code，故障诊断码 |
+| MIL | Malfunction Indicator Lamp，故障指示灯 |
+| UDS | Unified Diagnostic Services，统一诊断服务（ISO 14229）|
+| OBD | On-Board Diagnostics，车载诊断 |
+| IMMO | Immobilizer，防盗系统 |
+| HVIL | High Voltage Interlock Loop，高压互锁回路 |
+| VCU | Vehicle Control Unit，整车控制器 |
+| EDU | Electric Drive Unit，电机驱动控制器 |
+| ACC | Adaptive Cruise Control，自适应巡航控制 |
+| LSL | Linker Script Language，HighTec链接脚本语言 |
+| SSW | Startup Software，启动软件（英飞凌提供）|
+| NVM | Non-Volatile Memory，非易失性存储器 |
+| NMI | Non-Maskable Interrupt，不可屏蔽中断 |
+
+---
+
+*本手册根据 LeapEdrive_BswLib_TC377_D13 工程源码分析生成，如有疑问请参考具体源文件及英飞凌 TC377 参考手册。*
